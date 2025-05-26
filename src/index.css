@@ -1,0 +1,471 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Custom styles for the IT Helpdesk */
+.lt-bg {
+  background-color: #f6f6f6; /* Off-white background */
+}
+
+.header-bg {
+  background-color: #024d87; /* Dark blue header background */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.nav-bg {
+  background-color: #eee; /* Light grey nav background */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.lt-title {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 18pt;
+  color: black;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+  transition: color 0.2s ease;
+}
+
+.form-container {
+  border: 1px solid #eeeeee;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+  position: relative;
+}
+
+.form-container:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.form-label {
+  color: #666666;
+  font-size: 14pt;
+  font-weight: normal;
+  transition: color 0.2s ease;
+}
+
+.form-input {
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #eeeeee;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  font-size: 14pt;
+  color: black;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) inset;
+}
+
+.form-input:focus {
+  border-color: #0370c0;
+  box-shadow: 0 0 0 2px rgba(3, 112, 192, 0.2);
+  outline: none;
+}
+
+.form-input:hover:not(:focus) {
+  border-color: #0077bd;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3e%3c/path%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  cursor: pointer;
+}
+
+.lt-button-primary {
+  background-color: #0077bd;
+  color: white;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-size: 16pt;
+  height: auto;
+  min-height: 54px;
+  padding: 12px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.lt-button-primary:hover {
+  background-color: #0370c0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.lt-button-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.lt-button-secondary {
+  background-color: #003f72;
+  color: white;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-size: 16pt;
+  height: auto;
+  min-height: 54px;
+  padding: 12px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.lt-button-secondary:hover {
+  background-color: #024d87;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.lt-button-secondary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Button ripple effect */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple:after {
+  content: "";
+  background: rgba(255, 255, 255, 0.3);
+  display: block;
+  position: absolute;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  transform: scale(0);
+  transition: transform 0.6s, opacity 0.6s;
+  opacity: 0;
+}
+
+.btn-ripple:active:after {
+  transform: scale(2.5);
+  opacity: 0;
+  transition: 0s;
+}
+
+/* Heading styles */
+h1 {
+  font-size: 50pt;
+  font-weight: 300; /* light */
+  transition: color 0.2s ease;
+}
+
+h2 {
+  font-size: 30pt;
+  font-weight: 300; /* light */
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  width: 60px;
+  height: 3px;
+  background-color: #0370c0;
+  transform: translateX(-50%);
+  opacity: 0.7;
+  border-radius: 3px;
+}
+
+h3 {
+  font-size: 25pt;
+  font-weight: 300; /* light */
+  transition: color 0.2s ease;
+}
+
+h4 {
+  font-size: 20pt;
+  font-weight: 300; /* light */
+  transition: color 0.2s ease;
+}
+
+p {
+  font-size: 14pt;
+  font-weight: normal;
+  line-height: 1.6;
+}
+
+/* Back button animation */
+.back-button {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.back-button:hover {
+  transform: translateX(-3px);
+  color: #0370c0;
+}
+
+/* Required field indicator */
+.required-indicator {
+  position: relative;
+  display: inline-block;
+  color: #de3618;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+/* Footer styles */
+.footer-text {
+  color: #666666;
+  font-size: 14pt;
+}
+
+.legal-footer {
+  color: #999999;
+  font-size: 12pt;
+  text-align: center;
+}
+
+/* Login page styles */
+.login-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+}
+
+.login-left {
+  background-color: #f6f6f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-right {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 320px;
+  padding: 2rem;
+}
+
+.login-title {
+  color: #024d87;
+  font-size: 30pt;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.login-box {
+  border: 1px solid #eeeeee;
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.login-button {
+  background-color: #0077bd;
+  transition: all 0.2s ease;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  margin-top: 1rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-button:hover {
+  background-color: #0370c0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.forgot-password {
+  color: #0077bd;
+  font-size: 14pt;
+  text-align: right;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  color: #0370c0;
+  text-decoration: underline;
+}
+
+.login-field {
+  margin-bottom: 1.5rem;
+}
+
+/* Text area and file input styles */
+textarea.form-input {
+  min-height: 120px;
+  resize: vertical;
+  transition: min-height 0.3s ease;
+}
+
+textarea.form-input:focus {
+  min-height: 140px;
+}
+
+/* File input styling */
+.file-input-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.file-input-button {
+  background-color: #eee;
+  color: #666;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 14pt;
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-input-button:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.file-input {
+  position: absolute;
+  font-size: 100px;
+  opacity: 0;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+}
+
+.file-name {
+  margin-left: 10px;
+  color: #666;
+  font-size: 12pt;
+  vertical-align: middle;
+}
+
+/* Card hover effect */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Animated focus indicator for form fields */
+.input-focus-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #0370c0;
+  transition: width 0.3s ease;
+}
+
+.form-input:focus + .input-focus-indicator {
+  width: 100%;
+}
+
+/* Navigation indicator */
+.nav-indicator {
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 12pt;
+  color: #666;
+  z-index: 100;
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.nav-indicator.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
