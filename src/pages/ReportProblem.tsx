@@ -1,9 +1,14 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Upload, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Upload, HelpCircle } from 'lucide-react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const ReportProblem: React.FC = () => {
   const navigate = useNavigate();
@@ -158,15 +163,22 @@ const ReportProblem: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex justify-center mt-8">
+            <motion.div 
+              className="flex justify-center mt-10"
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <button 
                 type="submit" 
-                className="lt-button-primary btn-ripple max-w-[180px] w-full flex items-center justify-center"
+                className="lt-button-primary bg-lt-primary hover:bg-lt-primary/90 text-white font-medium py-2 px-6 rounded-md min-w-[180px] w-full max-w-xs flex items-center justify-center"
               >
-                <AlertCircle className="w-5 h-5 mr-2" />
+                <HelpCircle className="w-5 h-5 mr-2" />
                 Send to IT Helpdesk
               </button>
-            </div>
+            </motion.div>
           </form>
         </div>
       </div>
@@ -175,3 +187,4 @@ const ReportProblem: React.FC = () => {
 };
 
 export default ReportProblem;
+
