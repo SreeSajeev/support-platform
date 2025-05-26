@@ -39,7 +39,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 // Mock data for dropdowns
 const issueTypes = ["Clarification", "Create Specification", "Other"];
-const issueCategories = ["Critical", "High", "Medium", "Low"];
+const issueCategories = ["Software", "Hardware", "Infrastructure", "Application"];
 const ownersList = ["Alice", "Bob", "Charlie", "David", "Emma"];
 const reviewersList = ["Frank", "Grace", "Hannah", "Isaac", "Jane"];
 
