@@ -172,7 +172,7 @@ const Index: React.FC = () => {
             </p>
             <Button 
               onClick={() => navigate('/search-issue')} 
-              className="lt-button-primary w-full mt-auto"
+              className="lt-button-primary w-full "
             >
               Search Issues
             </Button>
