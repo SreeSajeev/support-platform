@@ -157,17 +157,17 @@ const Index: React.FC = () => {
           </motion.div>
           
           <motion.div 
-            className="bg-white rounded-lg shadow-lg hover-card p-6 text-center flex-col h-full"
+            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center"
             variants={itemVariants}
             whileHover={{ y: -5, boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)" }}
           >
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
               <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
                 <Search className="w-8 h-8 text-purple-600" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Search Issues</h3>
-            <p className="text-lt-grey mb-4 flex-grow">
+            <h3 className="text-xl font-semibold mb-3">Search Issues</h3>
+            <p className="text-lt-grey mb-6">
               Search for existing tickets and view their status
             </p>
             <Button 
