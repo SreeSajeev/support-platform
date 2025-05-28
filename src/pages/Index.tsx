@@ -157,7 +157,7 @@ const Index: React.FC = () => {
           </motion.div>
           
           <motion.div 
-            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center"
+            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center flex flex-col h-full"
             variants={itemVariants}
             whileHover={{ y: -5, boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)" }}
           >
@@ -172,7 +172,7 @@ const Index: React.FC = () => {
             </p>
             <Button 
               onClick={() => navigate('/search-issue')} 
-              className="lt-button-primary w-full "
+              className="lt-button-primary w-full mt-auto"
             >
               Search Issues
             </Button>
@@ -180,7 +180,7 @@ const Index: React.FC = () => {
 
           {/* New Card: Download UserID Form */}
           <motion.div 
-            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center"
+            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center flex flex-col h-full"
             variants={itemVariants}
             whileHover={{ y: -5, boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)" }}
           >
@@ -198,7 +198,7 @@ const Index: React.FC = () => {
                 // This would typically download a file
                 alert('UserID form download initiated');
               }} 
-              className="lt-button-primary w-full"
+              className="lt-button-primary w-full mt-auto"
             >
               Download Now
             </Button>
@@ -224,7 +224,7 @@ const Index: React.FC = () => {
                 // This would typically open the escalation flow view
                 alert('Escalation matrix view will open');
               }} 
-              className="lt-button-primary w-full"
+              className="lt-button-primary w-full mt-auto"
             >
               View Escalation Flow
             </Button>
@@ -233,7 +233,7 @@ const Index: React.FC = () => {
 
         {/* Previously Submitted Tickets Section */}
         <motion.div 
-          className="mb-8"
+          className="mb-6"
           variants={itemVariants}
         >
           <div className="bg-white rounded-lg shadow-lg p-6">
