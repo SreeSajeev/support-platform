@@ -9,6 +9,41 @@ import { motion } from 'framer-motion';
 const Index: React.FC = () => {
   const navigate = useNavigate();
 
+  {/* Start Previously Submitted Tickets Section */}
+
+  const previousTickets = [
+    {
+      id: "TKT-2024-001",
+      title: "Email configuration issue",
+      date: "2024-01-15",
+      status: "Resolved"
+    },
+    {
+      id: "TKT-2024-002", 
+      title: "Software installation request",
+      date: "2024-01-18",
+      status: "In Progress"
+    },
+    {
+      id: "TKT-2024-003",
+      title: "Network connectivity problem",
+      date: "2024-01-20",
+      status: "Open"
+    }
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Resolved': return 'text-green-600 bg-green-100';
+      case 'In Progress': return 'text-yellow-600 bg-yellow-100';
+      case 'Open': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  {/* End of Previously Submitted Tickets Section */}
+
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -195,7 +230,49 @@ const Index: React.FC = () => {
             </Button>
           </motion.div>
         </motion.div>
-        
+
+        {/* Previously Submitted Tickets Section */}
+        <motion.div 
+          className="mb-8"
+          variants={itemVariants}
+        >
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-lt-darkBlue">Previously Submitted Tickets</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {previousTickets.map((ticket) => (
+                <div key={ticket.id} className="border border-lt-lightGrey rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-lt-darkBlue text-sm">{ticket.id}</h4>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
+                      {ticket.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-lt-grey mb-2 line-clamp-2">{ticket.title}</p>
+                  <p className="text-xs text-lt-mutedGrey mb-3">Submitted: {ticket.date}</p>
+                  <Button 
+                    onClick={() => alert(`Viewing ticket ${ticket.id}`)}
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-xs"
+                  >
+                    View Details
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <Button 
+                onClick={() => alert('View all tickets')}
+                variant="ghost" 
+                className="text-lt-brightBlue hover:text-lt-darkBlue"
+              >
+                View All Tickets →
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/*End of  Previously Submitted Tickets Section */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-6"
           variants={containerVariants}
