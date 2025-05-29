@@ -21,7 +21,7 @@ const ReportProblem: React.FC = () => {
   const [inputDetails, setInputDetails] = useState('');
   const [systemMessage, setSystemMessage] = useState('');
   
-  const handleSubmit = (e: React.FormEvent) => {
+  /*const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!problemDescription) {
@@ -32,6 +32,49 @@ const ReportProblem: React.FC = () => {
     toast.success('Your problem has been reported successfully!');
     // Here would be the submission logic
   };
+  */
+    const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!problemDescription) {
+    toast.error('Please fill in the required Problem Description field.');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/report-problem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        problemDescription,
+        domain,
+        inputDetails,
+        systemMessage,
+      }),
+    });
+
+    if (response.ok) {
+      toast.success('Your problem has been reported successfully!');
+      // Reset form fields
+      setProblemDescription('');
+      setDomain('');
+      setInputDetails('');
+      setSystemMessage('');
+      setFileName('');
+    } else {
+      const errorData = await response.json();
+      toast.error(errorData.error || 'Failed to report problem.');
+    }
+  } catch (err) {
+    toast.error('Something went wrong.');
+    console.error(err);
+    console.error('❌ Error inserting problem:', err);
+  }
+};
+
+
 
   const handleFocus = (fieldName: string) => {
     setActiveField(fieldName);
@@ -99,10 +142,10 @@ const ReportProblem: React.FC = () => {
                   onBlur={handleBlur}
                 >
                   <option value="">Select Domain</option>
-                  <option value="option1">IT Infrastructure</option>
-                  <option value="option2">Software</option>
-                  <option value="option3">Hardware</option>
-                  <option value="option4">Network</option>
+                  <option value="IT Infrastructure">IT Infrastructure</option>
+                  <option value="Software">Software</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="Network">Network</option>
                 </select>
               </div>
               <div className={`input-focus-indicator ${activeField === 'domain' ? 'w-full' : 'w-0'}`}></div>

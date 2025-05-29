@@ -161,7 +161,7 @@ const Clarification: React.FC = () => {
                   activeField === 'problemStatement' ? 'text-lt-brightBlue' : ''
                 }`}
               >
-                Problem Statement / Change Reason
+                Problem Statement 
               </label>
               <textarea
                 id="problemStatement"
