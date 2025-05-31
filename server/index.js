@@ -21,8 +21,18 @@ const config = {
 
 // --- Middleware ---
 app.use(cors({
-  origin: 'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev', // allow frontend
+  origin: 'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true,
 }));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
 app.use(express.json()); // for parsing JSON bodies
 
 // --- Test SQL Connection on Startup ---
@@ -40,9 +50,11 @@ testSqlConnection();
 // --- Import and Use Routes ---
 const reportProblemRoute = require('./routes/reportProblem');
 const itHelpdeskRoutes = require('./routes/ithelpdeskview');
+const ClarificationRoutes = require('./routes/clarification');
 
 app.use('/api/report-problem', reportProblemRoute);
 app.use('/api/helpdesk-view', itHelpdeskRoutes);
+app.use('/api/clarification',ClarificationRoutes);
 
 // --- Root Route (For Quick Test) ---
 app.get('/', (req, res) => {
@@ -53,6 +65,7 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
 });
+
 
 // --- Optional Debug Route (can be removed in production) ---
 app.post('/api/debug-report-problem', async (req, res) => {

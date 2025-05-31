@@ -17,17 +17,47 @@ const Clarification: React.FC = () => {
   const [problemStatement, setProblemStatement] = useState('');
   const [domain, setDomain] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!problemDescription || !domain) {
-      toast.error('Please fill in all required fields.');
+  if (!problemDescription || !domain) {
+    toast.error('Please fill in all required fields.');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/clarification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        problemDescription,
+        domain,
+        problemStatement,
+        fileName,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      toast.error(`Submission failed: ${errorData.error}`);
       return;
     }
 
     toast.success('Your clarification request has been submitted successfully!');
-    // Submit logic goes here
-  };
+    
+    // Optionally reset form
+    setProblemDescription('');
+    setDomain('');
+    setProblemStatement('');
+    setFileName('');
+  } catch (error) {
+    console.error('❌ Error submitting form:', error);
+    toast.error('Something went wrong while submitting.');
+  }
+};
+
 
   const handleFocus = (fieldName: string) => setActiveField(fieldName);
   const handleBlur = () => setActiveField(null);
