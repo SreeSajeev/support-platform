@@ -53,12 +53,12 @@ const ITHelpdeskView: React.FC = () => {
       setError(null);
       try {
         // Uncomment and replace 'YOUR_API_ENDPOINT_HERE' with actual endpoint
-        const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev/helpdesk-view/');
+        {/*const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev/helpdesk-view/');
         if (!response.ok) throw new Error('Failed to fetch tickets');
         const data = await response.json();
         setTickets(data);
         setFilteredTickets(data);
-
+          */}
         // For now, using mock data
         setTickets(mockTickets);
         setFilteredTickets(mockTickets);
@@ -238,6 +238,13 @@ const ITHelpdeskView: React.FC = () => {
               <Download className="w-4 h-4" />
               Export CSV
             </Button>
+            <Button
+              className="bg-lt-brightBlue text-white hover:bg-blue-600"
+              onClick={() => navigate('/it-performance-dashboard')}
+            >
+              IT Performance Dashboard
+            </Button>
+
           </div>
         </div>
 
