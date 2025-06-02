@@ -265,7 +265,7 @@ const Index: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-3">IT Escalation Matrix</h3>
             <p className="text-lt-grey mb-6">
-              Access and download the official company UserID form
+              Check who to contact for issue escalations across functions
             </p>
             <Button 
               onClick={() => navigate('/IT-escalation-matrix')} 
@@ -277,8 +277,49 @@ const Index: React.FC = () => {
         </motion.div>
           
         
+         {/* Previously Submitted Tickets Section */}
+        <motion.div 
+          className="mb-6"
+          variants={itemVariants}
+        >
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-4 text-lt-darkBlue">Previously Submitted Tickets</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {previousTickets.map((ticket) => (
+                <div key={ticket.id} className="border border-lt-lightGrey rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-lt-darkBlue text-sm">{ticket.id}</h4>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
+                      {ticket.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-lt-grey mb-2 line-clamp-2">{ticket.title}</p>
+                  <p className="text-xs text-lt-mutedGrey mb-3">Submitted: {ticket.date}</p>
+                  <Button 
+                    onClick={() => navigate('/my-tickets')}
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-xs"
+                  >
+                    View Details
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <Button 
+                onClick={() => navigate('/my-tickets')}
+                variant="ghost" 
+                className="text-lt-brightBlue hover:text-lt-darkBlue"
+              >
+                View All Tickets →
+              </Button>
+            </div>
+          </div>
+        </motion.div>
 
-        {/* Previously Submitted Tickets Section */}
+        {/*End of  Previously Submitted Tickets Section */}
+        {/* Previously Submitted Tickets Section 
         <motion.div 
           className="mb-6"
           variants={itemVariants}
