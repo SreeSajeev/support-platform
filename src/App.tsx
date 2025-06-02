@@ -17,6 +17,7 @@ import ITPerformanceDashboard from "./pages/ITPerformanceDashboard";
 import TicketSummary from "./pages/TicketSummary";
 import TicketDetails from "./pages/TicketDetails";
 import Response from "./pages/Response";
+import UserID from "./pages/UserID";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +40,8 @@ const App = () => (
           <Route path="/ticket-summary" element={<TicketSummary />} />
           <Route path="/ticket-details" element={<TicketDetails />} />
           <Route path="/response" element={<Response />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/userID" element={<UserID />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE  */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
