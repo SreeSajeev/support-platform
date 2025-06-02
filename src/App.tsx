@@ -18,6 +18,7 @@ import TicketSummary from "./pages/TicketSummary";
 import TicketDetails from "./pages/TicketDetails";
 import Response from "./pages/Response";
 import UserID from "./pages/UserID";
+import ITEscalationMatrix from "./pages/ITEscalationMatrix";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/ticket-details" element={<TicketDetails />} />
           <Route path="/response" element={<Response />} />
           <Route path="/userID" element={<UserID />} />
+          <Route path="/it-escalation-matrix" element={<ITEscalationMatrix />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE  */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -225,8 +225,7 @@ const Index: React.FC = () => {
               Download Now
             </Button>
           </motion.div>
-*/}
-          {/* New Card: IT Escalation Matrix */}
+//it escalation matrix 
           <motion.div 
             className="bg-white rounded-lg shadow-lg hover-card p-8 text-center"
             variants={itemVariants}
@@ -252,6 +251,32 @@ const Index: React.FC = () => {
             </Button>
           </motion.div>
         </motion.div>
+
+*/}
+          <motion.div 
+            className="bg-white rounded-lg shadow-lg hover-card p-8 text-center flex flex-col h-full"
+            variants={itemVariants}
+            whileHover={{ y: -5, boxShadow: "0 12px 20px rgba(0, 0, 0, 0.15)" }}
+          >
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-cyan-100 flex items-center justify-center">
+                <GitBranch className="w-8 h-8 text-cyan-600" />
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold mb-3">IT Escalation Matrix</h3>
+            <p className="text-lt-grey mb-6">
+              Access and download the official company UserID form
+            </p>
+            <Button 
+              onClick={() => navigate('/IT-escalation-matrix')} 
+              className="lt-button-primary w-full"
+            >
+              View IT Escalation Flow
+            </Button>
+          </motion.div>
+        </motion.div>
+          
+        
 
         {/* Previously Submitted Tickets Section */}
         <motion.div 
