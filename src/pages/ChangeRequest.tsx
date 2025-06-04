@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRightLeft, Upload } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Upload } from 'lucide-react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,8 +10,8 @@ const ChangeRequest: React.FC = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [activeField, setActiveField] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
-  
-  // Form states
+
+  // Form fields
   const [requestedBy, setRequestedBy] = useState('');
   const [date, setDate] = useState('');
   const [contactDetails, setContactDetails] = useState('');
@@ -25,30 +24,67 @@ const ChangeRequest: React.FC = () => {
   const [consequences, setConsequences] = useState('');
   const [functionHeadEmail, setFunctionHeadEmail] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFocus = (fieldName: string) => setActiveField(fieldName);
+  const handleBlur = () => setActiveField(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setFileName(e.target.files[0].name);
+      toast.info(`File "${e.target.files[0].name}" selected.`);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!requestedBy || !date || !problemStatement) {
+
+    if (!requestedBy || !date || !problemStatement || !email || !functionHeadEmail) {
       toast.error('Please fill in all required fields.');
       return;
     }
-    
-    toast.success('Change request submitted successfully!');
-    // Here would be the submission logic
-  };
 
-  const handleFocus = (fieldName: string) => {
-    setActiveField(fieldName);
-  };
+    try {
+      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/change-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestedBy,
+          date,
+          contactDetails,
+          email,
+          problemStatement,
+          currentMethod,
+          proposedProcess,
+          expectedOutcome,
+          benefits,
+          consequences,
+          functionHeadEmail,
+          fileName,
+        }),
+      });
 
-  const handleBlur = () => {
-    setActiveField(null);
-  };
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(`Submission failed: ${errorData.error}`);
+        return;
+      }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFileName(e.target.files[0].name);
-      toast.info(`File "${e.target.files[0].name}" selected.`);
+      toast.success(' Change request submitted successfully!');
+      // Reset form
+      setRequestedBy('');
+      setDate('');
+      setContactDetails('');
+      setEmail('');
+      setProblemStatement('');
+      setCurrentMethod('');
+      setProposedProcess('');
+      setExpectedOutcome('');
+      setBenefits('');
+      setConsequences('');
+      setFunctionHeadEmail('');
+      setFileName('');
+    } catch (error) {
+      console.error('❌ Error submitting form:', error);
+      toast.error('Something went wrong while submitting.');
     }
   };
 
@@ -59,11 +95,11 @@ const ChangeRequest: React.FC = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
-        when: "beforeChildren",
-        staggerChildren: 0.1
-      }
-    }
+        ease: 'easeOut',
+        when: 'beforeChildren',
+        staggerChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants = {
@@ -71,8 +107,8 @@ const ChangeRequest: React.FC = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4, ease: "easeOut" }
-    }
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
   };
 
   return (

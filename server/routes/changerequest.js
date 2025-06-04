@@ -88,7 +88,7 @@ router.post('/', async (req, res) => {
     `);
 
 
-    console.log('✅ Insert result:', result);
+   
     res.status(201).json({ message: 'Change request submitted successfully.' });
     console.log('✅ Rows affected:', result.rowsAffected); // should be [1]
     console.log('✅ Insert successful');
