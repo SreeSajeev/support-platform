@@ -51,10 +51,12 @@ testSqlConnection();
 const reportProblemRoute = require('./routes/reportProblem');
 const itHelpdeskRoutes = require('./routes/ithelpdeskview');
 const ClarificationRoutes = require('./routes/clarification');
+const changeRequestsRoutes = require('./routes/changerequest');
 
 app.use('/api/report-problem', reportProblemRoute);
 app.use('/api/helpdesk-view', itHelpdeskRoutes);
 app.use('/api/clarification',ClarificationRoutes);
+app.use('/api/change-requests', changeRequestsRoutes);
 
 // --- Root Route (For Quick Test) ---
 app.get('/', (req, res) => {

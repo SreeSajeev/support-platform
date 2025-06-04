@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
 
-// Bring config from index.js
+// DB config - keep consistent with your working config
 const config = {
   user: 'adminuser',
   password: 'BUR123ger@',
@@ -14,38 +14,89 @@ const config = {
   },
 };
 
-// POST /api/report-problem
+// POST /api/change-requests
 router.post('/', async (req, res) => {
-  console.log('📥 Clarification POST route called');
-  console.log('Request body:', req.body);  
-  const { problemDescription, domain, problemStatement, fileName } = req.body;
+  console.log('📥 Change Request POST route called');
+  console.log('Request body:', req.body);
 
-  if (!problemDescription || !domain) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  const {
+    requestedBy,
+    date,
+    contactDetails,
+    email,
+    attachmentPath,
+    problemStatement,
+    currentMethod,
+    proposedNewProcess,
+    expectedOutcome,
+    benefits,
+    consequences,
+    functionHeadEmail,
+  } = req.body;
+
+  // Basic validation
+  if (!requestedBy || !date || !problemStatement) {
+    return res.status(400).json({ error: 'Please provide requestedBy, date, and problemStatement.' });
   }
- try {
-    // Connect to DB
+
+  try {
     const pool = await sql.connect(config);
 
-    // Insert query - adjust table/columns to your DB schema
-    const result = await pool.request()
-      .input('problemDescription', sql.NVarChar, problemDescription)
-      .input('domain', sql.NVarChar, domain)
+    await pool.request()
+      .input('requestedBy', sql.NVarChar, requestedBy)
+      .input('date', sql.Date, date)
+      .input('contactDetails', sql.NVarChar, contactDetails || null)
+      .input('email', sql.NVarChar, email || null)
+      .input('attachmentPath', sql.NVarChar, attachmentPath || null)
       .input('problemStatement', sql.NVarChar, problemStatement)
-      .input('fileName', sql.NVarChar, fileName)
-      .query(`INSERT INTO clarification 
-              (problemDescription, domain, problemStatement, fileName) 
-              VALUES (@problemDescription, @domain, @problemStatement, @fileName)`);
+      .input('currentMethod', sql.NVarChar, currentMethod || null)
+      .input('proposedNewProcess', sql.NVarChar, proposedNewProcess || null)
+      .input('expectedOutcome', sql.NVarChar, expectedOutcome || null)
+      .input('benefits', sql.NVarChar, benefits || null)
+      .input('consequences', sql.NVarChar, consequences || null)
+      .input('functionHeadEmail', sql.NVarChar, functionHeadEmail || null)
+      .query(`
+        INSERT INTO changerequests (
+          requestedBy,
+          date,
+          contactDetails,
+          email,
+          attachmentPath,
+          problemStatement,
+          currentMethod,
+          proposedNewProcess,
+          expectedOutcome,
+          benefits,
+          consequences,
+          functionHeadEmail
+        ) VALUES (
+          @requestedBy,
+          @date,
+          @contactDetails,
+          @email,
+          @attachmentPath,
+          @problemStatement,
+          @currentMethod,
+          @proposedNewProcess,
+          @expectedOutcome,
+          @benefits,
+          @consequences,
+          @functionHeadEmail
+        )
+      `);
 
     await pool.close();
 
-    res.json({ message: 'Clarification Ticket submitted successfully' });
-  } catch (err) {
-    console.error('DB insert error:', err);
-    res.status(500).json({ error: 'Failed to save clarification ticket' });
+    res.status(201).json({ message: 'Change request submitted successfully.' });
+  } catch (error) {
+    console.error('DB insert error:', error.stack || error);
+    res.status(500).json({ error: 'Failed to submit change request.', details: error.message || error });
   }
 });
+
+// Optional: Health check GET endpoint
 router.get('/', (req, res) => {
-  res.send('✅ Clarification endpoint is live and reachable via GET');
+  res.send('✅ Change Requests endpoint is live and reachable via GET');
 });
+
 module.exports = router;
