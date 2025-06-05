@@ -1024,11 +1024,12 @@ const TicketSummary: React.FC = () => {
   const [external, setExternal] = useState("");
 
   // TR-specific fields
-  const [developConfigure, setDevelopConfigure] = useState("");
-  const [unitTest, setUnitTest] = useState("");
-  const [implementOAS, setImplementOAS] = useState("");
-  const [qualityTest, setQualityTest] = useState("");
-  const [implementPRD, setImplementPRD] = useState("");
+  const [developConfigure, setDevelopConfigure] = React.useState(false);
+  const [unitTest, setUnitTest] = React.useState(false);
+  const [implementOAS, setImplementOAS] = React.useState(false);
+  const [qualityTest, setQualityTest] = React.useState(false);
+  const [implementPRD, setImplementPRD] = React.useState(false);
+
 
   const handleSubmit = async () => {
   if (!searchTerm.trim()) {
@@ -1240,30 +1241,65 @@ const TicketSummary: React.FC = () => {
 
             {/* TR Fields - Conditional */}
             <AnimatePresence>
-              {trApplicability === "TR Applicable" && (
-                <>
-                  <div>
-                    <label className="text-lt-darkBlue font-medium block mb-1">Develop / Configure</label>
-                    <Input value={developConfigure} onChange={(e) => setDevelopConfigure(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-lt-darkBlue font-medium block mb-1">Unit Test</label>
-                    <Input value={unitTest} onChange={(e) => setUnitTest(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-lt-darkBlue font-medium block mb-1">Implement in OAS</label>
-                    <Input value={implementOAS} onChange={(e) => setImplementOAS(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-lt-darkBlue font-medium block mb-1">Quality Test</label>
-                    <Input value={qualityTest} onChange={(e) => setQualityTest(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-lt-darkBlue font-medium block mb-1">Implement in PRD</label>
-                    <Input value={implementPRD} onChange={(e) => setImplementPRD(e.target.value)} />
-                  </div>
-                </>
-              )}
+                {trApplicability === "TR Applicable" && (
+                  <>
+                    <div>
+                      <label className="text-lt-darkBlue font-medium block mb-1">
+                        <input
+                          type="checkbox"
+                          checked={developConfigure}
+                          onChange={(e) => setDevelopConfigure(e.target.checked)}
+                          className="mr-2"
+                        />
+                        Develop / Configure
+                      </label>
+                    </div>
+                    <div>
+                      <label className="text-lt-darkBlue font-medium block mb-1">
+                        <input
+                          type="checkbox"
+                          checked={unitTest}
+                          onChange={(e) => setUnitTest(e.target.checked)}
+                          className="mr-2"
+                        />
+                        Unit Test
+                      </label>
+                    </div>
+                    <div>
+                      <label className="text-lt-darkBlue font-medium block mb-1">
+                        <input
+                          type="checkbox"
+                          checked={implementOAS}
+                          onChange={(e) => setImplementOAS(e.target.checked)}
+                          className="mr-2"
+                        />
+                        Implement in OAS
+                      </label>
+                    </div>
+                    <div>
+                      <label className="text-lt-darkBlue font-medium block mb-1">
+                        <input
+                          type="checkbox"
+                          checked={qualityTest}
+                          onChange={(e) => setQualityTest(e.target.checked)}
+                          className="mr-2"
+                        />
+                        Quality Test
+                      </label>
+                    </div>
+                    <div>
+                      <label className="text-lt-darkBlue font-medium block mb-1">
+                        <input
+                          type="checkbox"
+                          checked={implementPRD}
+                          onChange={(e) => setImplementPRD(e.target.checked)}
+                          className="mr-2"
+                        />
+                        Implement in PRD
+                      </label>
+                    </div>
+                  </>
+                )}
             </AnimatePresence>
           </CardContent>
         </Card>

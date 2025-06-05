@@ -33,7 +33,13 @@ router.post('/', async (req, res) => {
     func,
     plant,
     mobile,
-    external
+    external,
+    developConfigure,
+    unitTest,
+    implementOAS,
+    qualityTest,
+    implementPRD
+
   } = req.body;
 
   // Basic validation
@@ -61,20 +67,26 @@ router.post('/', async (req, res) => {
       .input('plant', sql.NVarChar, plant)
       .input('mobileNumber', sql.NVarChar, mobile)
       .input('externalNumber', sql.NVarChar, external)
+      .input('developConfigure', sql.Bit, developConfigure)
+      .input('unitTest', sql.Bit, unitTest)
+      .input('implementOAS', sql.Bit, implementOAS)
+      .input('qualityTest', sql.Bit, qualityTest)
+      .input('implementPRD', sql.Bit, implementPRD)
+
       .query(`
         INSERT INTO ticketSummary (
           Type, Domain, SearchTerm, RequestedBy, Reviewer,
           TRApplicability, TRDetails, TRReason,
           Status, Date, 
           TransactionName, Product, FunctionName,
-          Plant, MobileNumber, ExternalNumber
+          Plant, MobileNumber, ExternalNumber,DevelopConfigure, UnitTest, ImplementInOAS, QualityTest, ImplementInPRD
         )
         VALUES (
           @type, @domain, @searchTerm, @requestedBy, @reviewer,
           @trApplicable, @trDetails, @trReason,
           @status, @date, 
           @transactionName, @product, @functionName,
-          @plant, @mobileNumber, @externalNumber
+          @plant, @mobileNumber, @externalNumber,@developConfigure, @unitTest, @implementOAS, @qualityTest, @implementPRD
         )
       `);
 
