@@ -142,10 +142,9 @@ const ReportProblem: React.FC = () => {
                   onBlur={handleBlur}
                 >
                   <option value="">Select Domain</option>
-                  <option value="IT Infrastructure">IT Infrastructure</option>
-                  <option value="Software">Software</option>
-                  <option value="Hardware">Hardware</option>
-                  <option value="Network">Network</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                  <option value="Applcation">Applciation</option>
+                  
                 </select>
               </div>
               <div className={`input-focus-indicator ${activeField === 'domain' ? 'w-full' : 'w-0'}`}></div>

@@ -20,7 +20,7 @@ import Response from "./pages/Response";
 import UserID from "./pages/UserID";
 import ITEscalationMatrix from "./pages/ITEscalationMatrix";
 import PreviouslySubmittedTickets from "./pages/PreviouslySubmittedTickets";
-
+import ProblemsPage from './pages/ProblemsPage';
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,6 +45,7 @@ const App = () => (
           <Route path="/userID" element={<UserID />} />
           <Route path="/it-escalation-matrix" element={<ITEscalationMatrix />} />
           <Route path="/my-tickets" element={<PreviouslySubmittedTickets />} />
+          <Route path="/problems" element={<ProblemsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE  */}
           <Route path="*" element={<NotFound />} />
         </Routes>

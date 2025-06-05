@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
       .input('psNumber', sql.NVarChar, psNumber)
       .input('reportedBy', sql.NVarChar, reportedBy)
       .query(`
-        INSERT INTO Problems (description, domain, inputDetails, systemMessage, psNumber, reportedBy)
+        INSERT INTO OldProblems (description, domain, inputDetails, systemMessage, psNumber, reportedBy)
         VALUES (@description, @domain, @inputDetails, @systemMessage, @psNumber, @reportedBy)
       `);
 
