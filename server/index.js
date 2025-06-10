@@ -54,6 +54,8 @@ const ClarificationRoutes = require('./routes/clarification');
 const changeRequestsRoutes = require('./routes/changerequest');
 const ProblemsRoutes = require('./routes/problem');
 const TicketSummaryRoutes = require('./routes/ticketsummary');
+const ITPerformanceRoutes = require('./routes/itperformance');
+
 
 app.use('/api/report-problem', reportProblemRoute);
 app.use('/api/helpdesk-view', itHelpdeskRoutes);
@@ -61,6 +63,8 @@ app.use('/api/clarification',ClarificationRoutes);
 app.use('/api/change-requests', changeRequestsRoutes);
 app.use('/api/problems', ProblemsRoutes);
 app.use('/api/ticket-summary', TicketSummaryRoutes);
+app.use('/api/it-performance', ITPerformanceRoutes);
+
 // --- Root Route (For Quick Test) ---
 app.get('/', (req, res) => {
   res.send('🚀 Welcome to the Support Platform Backend API!');

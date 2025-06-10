@@ -1100,7 +1100,11 @@ const TicketSummary: React.FC = () => {
   }
 
   toast.success("Ticket summary saved successfully!");
-  navigate('/ticket-details', { state: { ticketId } });
+  
+  navigate('/ticket-details', {
+  state: { ticketId, requestedBy, date, status, age, domain, type, /* any others*/ }
+});
+
 } catch (error: any) {
   console.error("Submission Error:", error);
   toast.error(error.message || "Error submitting ticket summary");
@@ -1198,7 +1202,7 @@ const TicketSummary: React.FC = () => {
               </ToggleGroup>
             </div>
 
-            {/* Prefilled Fields */}
+          
             <div>
               <label className="text-lt-darkBlue font-medium block mb-1">Date</label>
               <Input value={date} readOnly />

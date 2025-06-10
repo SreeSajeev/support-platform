@@ -550,6 +550,20 @@ const ITHelpdeskView: React.FC = () => {
               Export CSV
             </Button>
           </motion.div>
+           <div className="flex items-end gap-2">
+    <Button variant="outline" className="gap-2" onClick={handleSearch}>
+      <Search className="w-4 h-4" />
+      Search
+    </Button>
+
+    <Button
+      variant="secondary"  // Or "outline" or whatever your design system has
+      className="gap-2"
+      onClick={() => navigate('/it-performance-dashboard')}
+    >
+      IT Performance Dashboard
+    </Button>
+  </div>
         </motion.div>
 
         <motion.div
@@ -591,7 +605,23 @@ const ITHelpdeskView: React.FC = () => {
                     <TableCell>{ticket.RaisedBy}</TableCell>
                     <TableCell>{ticket.status}</TableCell>
                     <TableCell>{formatDate(ticket.Date)}</TableCell>
-                    <TableCell>{ticket.AssignedTo}</TableCell>
+                    <TableCell className="flex gap-2">
+
+                      {(!ticket.AssignedTo || ticket.AssignedTo.trim() === "") ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleGoToTicket(ticket)}
+                      >
+                        Take Ticket
+                      </Button>
+                    ) : (
+                      <span>{ticket.AssignedTo}</span>
+                    )}
+
+                      
+                    </TableCell>
+
                     <TableCell>
                       <Button
                         size="sm"

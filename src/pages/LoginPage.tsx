@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
@@ -6,44 +5,65 @@ import { toast } from 'sonner';
 import { Button } from "@/components/ui/button";
 import Logo from '../components/Logo';
 
+interface User {
+  name: string;
+  email: string;
+  ps: string;
+}
+
+const mockUsers: Record<string, User[]> = {
+  IT: [
+    { name: 'Alice Johnson', email: 'alice.johnson@example.com', ps: 'PS1001' },
+    { name: 'Bob Smith', email: 'bob.smith@example.com', ps: 'PS1002' },
+  ],
+  Others: [
+    { name: 'Charlie Williams', email: 'charlie.williams@example.com', ps: 'PS2001' },
+    { name: 'Dana Brown', email: 'dana.brown@example.com', ps: 'PS2002' },
+  ],
+};
+
 const LoginPage: React.FC = () => {
   const [userGroup, setUserGroup] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const [emailError, setEmailError] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState<boolean>(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const validateEmail = (email: string): boolean => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!userGroup) {
       toast.error('Please select a user group');
       return;
     }
 
-    if (!email) {
-      setEmailError('Email is required');
+    if (!selectedUser) {
+      toast.error('Please select a user');
       return;
     }
 
-    if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
-      return;
-    }
+    // Save user details in localStorage
+    localStorage.setItem('userName', selectedUser.name);
+    localStorage.setItem('userEmail', selectedUser.email);
+    localStorage.setItem('userPS', selectedUser.ps);
 
-    setEmailError('');
-    
-    // Redirect based on user group
+    // Navigate based on group
     if (userGroup === 'IT') {
       navigate('/it-helpdesk-view');
     } else {
       navigate('/');
     }
+  };
+
+  const handleGroupSelect = (group: string) => {
+    setUserGroup(group);
+    setSelectedUser(null);
+    setIsGroupDropdownOpen(false);
+  };
+
+  const handleUserSelect = (user: User) => {
+    setSelectedUser(user);
+    setIsUserDropdownOpen(false);
   };
 
   return (
@@ -58,59 +78,71 @@ const LoginPage: React.FC = () => {
           <div className="bg-white p-8 rounded-lg shadow-md border border-lt-lightGrey">
             <h2 className="text-[30pt] font-light text-lt-darkBlue mb-8 text-center">LOGIN</h2>
             <form onSubmit={handleSubmit}>
+              {/* Group Dropdown */}
               <div className="mb-6">
                 <label className="form-label block mb-2">User Group</label>
                 <div className="relative">
                   <button
                     type="button"
                     className="form-input flex justify-between items-center w-full cursor-pointer"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
                   >
-                    <span>{userGroup || 'Select User Group'}</span>
+                    <span>{userGroup || 'Select  Group'}</span>
                     <ChevronDown className="h-5 w-5 text-lt-grey" />
                   </button>
-                  {isDropdownOpen && (
+                  {isGroupDropdownOpen && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-lt-lightGrey rounded-md shadow-lg">
                       <ul>
                         <li
                           className="px-4 py-2 hover:bg-lt-lightGrey cursor-pointer"
-                          onClick={() => {
-                            setUserGroup('IT');
-                            setIsDropdownOpen(false);
-                          }}
+                          onClick={() => handleGroupSelect('IT')}
                         >
-                          IT
+                          Infrastructure
                         </li>
                         <li
                           className="px-4 py-2 hover:bg-lt-lightGrey cursor-pointer"
-                          onClick={() => {
-                            setUserGroup('Others');
-                            setIsDropdownOpen(false);
-                          }}
+                          onClick={() => handleGroupSelect('Others')}
                         >
-                          Others
+                          Application
                         </li>
                       </ul>
                     </div>
                   )}
                 </div>
               </div>
-              <div className="mb-6">
-                <label htmlFor="email" className="form-label block mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className={`form-input ${emailError ? 'border-red-500' : ''}`}
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {emailError && (
-                  <p className="text-red-500 text-sm mt-1">{emailError}</p>
-                )}
-              </div>
+
+              {/* User Dropdown */}
+              {userGroup && (
+                <div className="mb-6">
+                  <label className="form-label block mb-2">User</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      className="form-input flex justify-between items-center w-full cursor-pointer"
+                      onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                    >
+                      <span>{selectedUser?.name || 'Select User'}</span>
+                      <ChevronDown className="h-5 w-5 text-lt-grey" />
+                    </button>
+                    {isUserDropdownOpen && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-lt-lightGrey rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        <ul>
+                          {mockUsers[userGroup].map((user) => (
+                            <li
+                              key={user.email}
+                              className="px-4 py-2 hover:bg-lt-lightGrey cursor-pointer"
+                              onClick={() => handleUserSelect(user)}
+                            >
+                              {user.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-center">
                 <Button 
                   type="submit" 
