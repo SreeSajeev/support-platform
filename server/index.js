@@ -55,6 +55,8 @@ const changeRequestsRoutes = require('./routes/changerequest');
 const ProblemsRoutes = require('./routes/problem');
 const TicketSummaryRoutes = require('./routes/ticketsummary');
 const ITPerformanceRoutes = require('./routes/itperformance');
+const TicketDetailsRoutes = require('./routes/ticketdetails');
+const TicketResponseRoutes = require('./routes/response');
 
 
 app.use('/api/report-problem', reportProblemRoute);
@@ -64,6 +66,8 @@ app.use('/api/change-requests', changeRequestsRoutes);
 app.use('/api/problems', ProblemsRoutes);
 app.use('/api/ticket-summary', TicketSummaryRoutes);
 app.use('/api/it-performance', ITPerformanceRoutes);
+app.use('/api/ticket-details', TicketDetailsRoutes);
+app.use('/api/ticket-responses', TicketResponseRoutes);
 
 // --- Root Route (For Quick Test) ---
 app.get('/', (req, res) => {

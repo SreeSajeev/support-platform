@@ -418,6 +418,7 @@ const ITPerformanceDashboard: React.FC = () => {
 export default ITPerformanceDashboard;
 */}
 
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -459,34 +460,22 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
-  const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isHovering, setIsHovering] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       try {
         const BASE_URL = 'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev';
-
-        const metricsRes = await fetch(`${BASE_URL}/api/it-performance/metrics`);
-        const ticketsRes = await fetch(`${BASE_URL}/api/it-performance/tickets`);
-
-        if (!metricsRes.ok || !ticketsRes.ok) {
-          throw new Error(`HTTP Error! Metrics: ${metricsRes.status}, Tickets: ${ticketsRes.status}`);
-        }
-
-        const metricsData = await metricsRes.json();
-        const ticketsData = await ticketsRes.json();
-
-        setMetrics(metricsData);
-        setTickets(ticketsData);
+        const res = await fetch(`${BASE_URL}/api/it-performance/tickets`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setTickets(data);
       } catch (err: any) {
-        setError(err.message || 'Unknown error occurred. Please reach out to support.');
+        setError(err.message || 'Unknown error occurred.');
       }
     }
-
     fetchData();
   }, []);
 
@@ -495,43 +484,114 @@ export default function Dashboard() {
       <div className="text-center text-red-600 p-10">
         <p>❌ Error loading dashboard:</p>
         <p className="mt-2 font-mono">{error}</p>
-        <p className="mt-4">Please reach out to <strong>support</strong> for queries.</p>
+        <p className="mt-4">Please contact <strong>support</strong>.</p>
       </div>
     );
   }
 
-  if (!metrics || tickets.length === 0) {
-    return (
-      <div className="text-center p-10">⏳ Loading data... (Check console logs for details)</div>
-    );
+  if (tickets.length === 0) {
+    return <div className="text-center p-10">⏳ Loading data...</div>;
   }
 
-  const ticketTypeData = [
-    { name: 'High', value: metrics.highPriorityTickets, color: '#ff6b6b' },
-    { name: 'Medium', value: metrics.mediumPriorityTickets, color: '#feca57' },
-    { name: 'Low', value: metrics.lowPriorityTickets, color: '#1dd1a1' },
-  ];
+  const priorities = ['High', 'Medium', 'Low'];
+  const priorityColors: Record<string, string> = {
+    High: '#ff6b6b',
+    Medium: '#feca57',
+    Low: '#1dd1a1',
+  };
+
+  const ticketTypeData = priorities.map(priority => ({
+    name: priority,
+    value: tickets.filter(t => t.Priority === priority).length,
+    color: priorityColors[priority],
+  })).filter(d => d.value > 0);
+
+  const resolutionTimeByPriority = priorities.map(priority => {
+    const filtered = tickets.filter(t => t.Priority === priority);
+    const avg = filtered.reduce((sum, t) => sum + t.ResolutionTime, 0) / (filtered.length || 1);
+    return { priority, avgResolutionTime: parseFloat(avg.toFixed(2)) };
+  }).filter(d => d.avgResolutionTime > 0);
+
+  const complianceRadar = priorities.map(priority => {
+    const filtered = tickets.filter(t => t.Priority === priority);
+    const avg = filtered.reduce((sum, t) => sum + t.SLACompliance, 0) / (filtered.length || 1);
+    return { priority, slaCompliance: parseFloat(avg.toFixed(2)) };
+  }).filter(d => d.slaCompliance > 0);
 
   const agentPerformance = Array.from(
-    tickets.reduce((acc, ticket) => {
-      const key = ticket.AssignedTo;
+    tickets.reduce((acc, t) => {
+      const key = t.AssignedTo;
       if (!acc.has(key)) acc.set(key, { agent: key, tickets: 0 });
       acc.get(key)!.tickets++;
       return acc;
     }, new Map<string, { agent: string; tickets: number }>())
   ).map(([, value]) => value);
 
-  const resolutionTimeByPriority = ['High', 'Medium', 'Low'].map(priority => {
-    const filtered = tickets.filter(t => t.Priority === priority);
-    const avg = filtered.reduce((sum, t) => sum + t.ResolutionTime, 0) / (filtered.length || 1);
-    return { priority, avgResolutionTime: parseFloat(avg.toFixed(2)) };
-  });
-
-  const complianceRadar = ['High', 'Medium', 'Low'].map(priority => {
-    const filtered = tickets.filter(t => t.Priority === priority);
-    const avg = filtered.reduce((sum, t) => sum + t.SLACompliance, 0) / (filtered.length || 1);
-    return { priority, slaCompliance: parseFloat(avg.toFixed(2)) };
-  });
+  const chartCards = [
+    {
+      title: 'Ticket Priority Distribution',
+      chart: ticketTypeData.length === 0 ? (
+        <p className="text-center text-gray-400">No ticket data</p>
+      ) : (
+        <PieChart>
+          <Pie
+            data={ticketTypeData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={70}
+            label
+          >
+            {ticketTypeData.map((entry, index) => (
+              <Cell key={index} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      )
+    },
+    {
+      title: 'Resolution Time by Priority',
+      chart: resolutionTimeByPriority.length === 0 ? (
+        <p className="text-center text-gray-400">No resolution data</p>
+      ) : (
+        <BarChart data={resolutionTimeByPriority}>
+          <XAxis dataKey="priority" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="avgResolutionTime" fill="#5f27cd" />
+        </BarChart>
+      )
+    },
+    {
+      title: 'SLA Compliance Radar',
+      chart: complianceRadar.length === 0 ? (
+        <p className="text-center text-gray-400">No SLA data</p>
+      ) : (
+        <RadarChart data={complianceRadar}>
+          <PolarGrid />
+          <PolarAngleAxis dataKey="priority" />
+          <PolarRadiusAxis angle={30} domain={[0, 100]} />
+          <Radar dataKey="slaCompliance" stroke="#00cec9" fill="#00cec9" fillOpacity={0.6} />
+          <Tooltip />
+        </RadarChart>
+      )
+    },
+    {
+      title: 'Agent Ticket Count',
+      chart: agentPerformance.length === 0 ? (
+        <p className="text-center text-gray-400">No agent data</p>
+      ) : (
+        <BarChart data={agentPerformance}>
+          <XAxis dataKey="agent" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="tickets" fill="#ff9f43" />
+        </BarChart>
+      )
+    }
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-lt-offWhite">
@@ -545,88 +605,61 @@ export default function Dashboard() {
           <button
             onClick={() => navigate('/it-helpdesk-view')}
             className="text-lt-grey hover:text-lt-brightBlue transition-colors flex items-center"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
           >
-            <ArrowLeft className={`w-5 h-5 mr-1 ${isHovering ? 'transform -translate-x-1 transition-transform' : 'transition-transform'}`} />
+            <ArrowLeft className="w-5 h-5 mr-1" />
             <span>Back to Helpdesk View</span>
           </button>
         </div>
-
         <motion.h1
           className="text-[30pt] font-light text-center mb-8"
           variants={itemVariants}
         >
           IT Team Performance Dashboard
         </motion.h1>
-
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          variants={itemVariants}
+        >
+          <div className="bg-white p-6 rounded-lg shadow-md border border-lt-lightGrey hover-card">
+            <h3 className="text-[20pt] font-normal text-lt-darkBlue mb-2">Total Tickets Resolved</h3>
+            <div className="flex justify-between items-end">
+              <div className="text-4xl font-light text-lt-brightBlue">386</div>
+              <div className="flex flex-col text-right">
+                <span className="text-sm text-lt-grey">Today: 12</span>
+                <span className="text-sm text-lt-grey">This Week: 73</span>
+                <span className="text-sm text-lt-grey">This Month: 301</span>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md border border-lt-lightGrey hover-card">
+            <h3 className="text-[20pt] font-normal text-lt-darkBlue mb-2">Avg. Resolution Time</h3>
+            <div className="text-4xl font-light text-lt-brightBlue">3.2 days</div>
+            <div className="text-sm text-green-600 mt-2">↓ 0.5 days from last month</div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-md border border-lt-lightGrey hover-card">
+            <h3 className="text-[20pt] font-normal text-lt-darkBlue mb-2">SLA Compliance</h3>
+            <div className="text-4xl font-light text-lt-brightBlue">94.2%</div>
+            <div className="text-sm text-green-600 mt-2">↑ 2.1% from last month</div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-md border border-lt-lightGrey hover-card">
+            <h3 className="text-[20pt] font-normal text-lt-darkBlue mb-2">Most Active Member</h3>
+            <div className="text-2xl font-light text-lt-brightBlue">Alice Johnson</div>
+            <div className="text-sm text-lt-grey mt-2">42 tickets resolved this month</div>
+          </div>
+        </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold">Ticket Priority Distribution</h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={ticketTypeData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={70}
-                    label
-                  >
-                    {ticketTypeData.map((entry, index) => (
-                      <Cell key={index} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold">Resolution Time by Priority</h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={resolutionTimeByPriority}>
-                  <XAxis dataKey="priority" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="avgResolutionTime" fill="#5f27cd" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold">SLA Compliance Radar</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <RadarChart data={complianceRadar}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="priority" />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                  <Radar dataKey="slaCompliance" stroke="#00cec9" fill="#00cec9" fillOpacity={0.6} />
-                  <Tooltip />
-                </RadarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <h2 className="text-lg font-semibold mb-2">Agent Ticket Count</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={agentPerformance}>
-                  <XAxis dataKey="agent" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="tickets" fill="#ff9f43" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {chartCards.map((card, idx) => (
+            <Card key={idx}>
+              <CardContent className="p-4">
+                <h2 className="text-lg font-semibold mb-2">{card.title}</h2>
+                <ResponsiveContainer width="100%" height={250}>
+                  {card.chart}
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </motion.div>
     </div>
