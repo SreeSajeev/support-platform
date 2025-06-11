@@ -35,12 +35,12 @@ router.get('/', (req, res) => {
 
 // POST route to report a problem
 router.post('/', async (req, res) => {
-  const { problemDescription, domain, inputDetails, systemMessage } = req.body;
+  const { description, domain, inputDetails, systemMessage } = req.body;
 
   // Validation
-  if (!problemDescription || !domain) {
+  if (!description || !domain) {
     return res.status(400).json({
-      error: 'Missing required fields: problemDescription and domain',
+      error: 'Missing required fields: Description and domain',
     });
   }
 
@@ -52,15 +52,15 @@ router.post('/', async (req, res) => {
     const pool = await getPool();
 
     const result = await pool.request()
-      .input('description', sql.NVarChar, problemDescription)
+      .input('description', sql.NVarChar, description)
       .input('domain', sql.NVarChar, domain)
       .input('inputDetails', sql.NVarChar, inputDetails || '')
       .input('systemMessage', sql.NVarChar, systemMessage || '')
       .input('psNumber', sql.NVarChar, psNumber)
       .input('reportedBy', sql.NVarChar, reportedBy)
       .query(`
-        INSERT INTO OldProblems (description, domain, inputDetails, systemMessage, psNumber, reportedBy)
-        VALUES (@description, @domain, @inputDetails, @systemMessage, @psNumber, @reportedBy)
+        INSERT INTO OldProblems (description, domain, inputDetails, systemMessage)
+        VALUES (@description, @domain, @inputDetails, @systemMessage)
       `);
 
     res.status(200).json({ message: ' Problem reported successfully', result });
@@ -89,7 +89,7 @@ router.get('/all', async (req, res) => {
     console.log('🔍 Trying to fetch all problems...');
 
     const result = await pool.request()
-      .query('SELECT * FROM Problems');
+      .query('SELECT * FROM OldProblems');
 
     console.log('✅ Problems fetched:', result.recordset);
     res.status(200).json(result.recordset);
@@ -98,7 +98,5 @@ router.get('/all', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch reported problems' });
   }
 });
-
-
 
 module.exports = router;

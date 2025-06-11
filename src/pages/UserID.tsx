@@ -13,6 +13,7 @@ const itemVariants = {
 
 const UserIdRequest: React.FC = () => {
   const navigate = useNavigate();
+  const [isHovering, setIsHovering] = useState(false);
   const [activeField, setActiveField] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   
@@ -144,13 +145,18 @@ const UserIdRequest: React.FC = () => {
         </div>
         
         <div className="form-container w-full p-8 relative hover-card">
-          <button 
-            onClick={() => navigate('/')}
-            className="back-button absolute top-6 left-6"
-          >
-            <ArrowLeft className="w-6 h-6" />
-            <span className="ml-1 text-sm font-medium">Back to Helpdesk</span>
-          </button>
+           <motion.button
+                      onClick={() => navigate('/')}
+                      className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
+                      onMouseEnter={() => setIsHovering(true)}
+                      onMouseLeave={() => setIsHovering(false)}
+                      whileHover={{ x: -5 }}
+                      whileTap={{ scale: 0.97 }}
+                      variants={itemVariants}
+                    >
+                      <ArrowLeft className="w-6 h-6 mr-1" />
+                      <span className="text-sm font-medium">Back to Helpdesk</span>
+                    </motion.button>
           
           <form onSubmit={handleSubmit} className="pt-12">
             {/* Access Types Section */}

@@ -16,7 +16,7 @@ const ReportProblem: React.FC = () => {
   const [fileName, setFileName] = useState<string>('');
   
   // Form states
-  const [problemDescription, setProblemDescription] = useState('');
+  const [description, setProblemDescription] = useState('');
   const [domain, setDomain] = useState('');
   const [inputDetails, setInputDetails] = useState('');
   const [systemMessage, setSystemMessage] = useState('');
@@ -36,7 +36,7 @@ const ReportProblem: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  if (!problemDescription) {
+  if (!description) {
     toast.error('Please fill in the required Problem Description field.');
     return;
   }
@@ -48,7 +48,7 @@ const ReportProblem: React.FC = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        problemDescription,
+        description,
         domain,
         inputDetails,
         systemMessage,
@@ -111,21 +111,21 @@ const ReportProblem: React.FC = () => {
           
           <form onSubmit={handleSubmit} className="pt-12">
             <div className="mb-6 relative">
-              <label htmlFor="problemDescription" className={`form-label block mb-2 ${activeField === 'problemDescription' ? 'text-lt-brightBlue' : ''}`}>
+              <label htmlFor="description" className={`form-label block mb-2 ${activeField === 'description' ? 'text-lt-brightBlue' : ''}`}>
                 Problem Description <span className="text-red-500 required-indicator">*</span>
               </label>
               <input 
                 type="text" 
-                id="problemDescription" 
+                id="description" 
                 className="form-input" 
                 placeholder="Enter problem description" 
                 required
-                value={problemDescription}
+                value={description}
                 onChange={(e) => setProblemDescription(e.target.value)}
-                onFocus={() => handleFocus('problemDescription')}
+                onFocus={() => handleFocus('description')}
                 onBlur={handleBlur}
               />
-              <div className={`input-focus-indicator ${activeField === 'problemDescription' ? 'w-full' : 'w-0'}`}></div>
+              <div className={`input-focus-indicator ${activeField === 'description' ? 'w-full' : 'w-0'}`}></div>
             </div>
             
             <div className="mb-6 relative">
@@ -143,7 +143,7 @@ const ReportProblem: React.FC = () => {
                 >
                   <option value="">Select Domain</option>
                   <option value="Infrastructure">Infrastructure</option>
-                  <option value="Applcation">Applciation</option>
+                  <option value="Applcation">Application</option>
                   
                 </select>
               </div>

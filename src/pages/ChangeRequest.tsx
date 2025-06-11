@@ -139,18 +139,18 @@ const ChangeRequest: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.button 
-            onClick={() => navigate('/')}
-            className="back-button absolute top-6 left-6 text-white hover:text-lt-brightBlue transition-colors flex items-center"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            whileHover={{ x: -5 }}
-            whileTap={{ scale: 0.97 }}
-            variants={itemVariants}
-          >
-            <ArrowLeft className={`w-6 h-6 ${isHovering ? 'transform -translate-x-1 transition-transform' : 'transition-transform'}`} />
-            <span className="ml-1 text-sm font-medium">Back to Helpdesk</span>
-          </motion.button>
+           <motion.button
+                      onClick={() => navigate('/')}
+                      className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
+                      onMouseEnter={() => setIsHovering(true)}
+                      onMouseLeave={() => setIsHovering(false)}
+                      whileHover={{ x: -5 }}
+                      whileTap={{ scale: 0.97 }}
+                      variants={itemVariants}
+                    >
+                      <ArrowLeft className="w-6 h-6 mr-1" />
+                      <span className="text-sm font-medium">Back to Helpdesk</span>
+                    </motion.button>
           
           <form onSubmit={handleSubmit} className="pt-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
