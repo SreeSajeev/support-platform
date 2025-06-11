@@ -266,15 +266,14 @@ const TicketDetails: React.FC = () => {
   const navigate = useNavigate();
 
   const {
-    ticketId = '',
+    
     date = '',
-    issueType = '',
-    category = '',
-    searchItem = '',
+    type= '',
+    domain='',
+    searchTerm = '',
     transaction = '',
-    taskStatus = '',
+    status = '',
     age = '',
-    responseThread = '',
   } = location.state || {};
 
   const [problemStatement, setProblemStatement] = useState('');
@@ -329,7 +328,7 @@ const TicketDetails: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          TicketID: ticketId,
+          
           ProblemStatement: problemStatement,
           RootCauseObjective: rootCause,
           ReviewRemarks: reviewRemarks,
@@ -373,100 +372,132 @@ const TicketDetails: React.FC = () => {
           </button>
         </div>
 
-        <motion.div className="bg-white rounded-lg shadow-lg p-6" variants={itemVariants}>
-          <h2 className="text-2xl font-light text-lt-darkBlue mb-6">Analyse and Propose</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <motion.div className="bg-white rounded-lg shadow-lg p-6" variants={itemVariants}>
+              <h2 className="text-2xl font-light text-lt-darkBlue mb-6">Analyse and Propose</h2>
 
-          <div className="space-y-6">
-            {[
-              {
-                label: 'Problem Statement/Requirement',
-                value: problemStatement,
-                onChange: setProblemStatement,
-                placeholder: 'Enter the problem statement or requirement in detail',
-              },
-              {
-                label: 'Root Cause & Objective',
-                value: rootCause,
-                onChange: setRootCause,
-                placeholder: 'Describe the root cause and the objective',
-              },
-              {
-                label: 'Review Remarks',
-                value: reviewRemarks,
-                onChange: setReviewRemarks,
-                placeholder: 'Add your review remarks',
-              },
-              {
-                label: 'Previous Review',
-                value: previousReview,
-                onChange: setPreviousReview,
-                placeholder: 'Enter previous review details if any',
-              },
-              {
-                label: 'Additional Notes',
-                value: additionalNotes,
-                onChange: setAdditionalNotes,
-                placeholder: 'Add any additional notes or observations',
-              },
-            ].map(({ label, value, onChange, placeholder }, idx) => (
-              <motion.div key={idx} variants={itemVariants}>
-                <label className="block text-lt-darkBlue font-medium mb-2">{label}</label>
-                <Textarea
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  className="w-full h-32 resize-none focus:ring-2 focus:ring-lt-brightBlue"
-                  placeholder={placeholder}
-                />
-              </motion.div>
-            ))}
-
-            <motion.div variants={itemVariants}>
-              <label className="block text-lt-darkBlue font-medium mb-2">Attachment Upload</label>
-              <label className="lt-button-secondary inline-flex items-center cursor-pointer mb-3">
-                <Paperclip className="w-4 h-4 mr-2" /> Upload Files
-                <input type="file" multiple onChange={handleFileChange} className="hidden" />
-              </label>
-
-              {attachments.length > 0 &&
-                attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between bg-lt-offWhite p-2 rounded mb-2">
-                    <span className="text-sm text-lt-grey truncate">{file.name}</span>
-                    <Button variant="ghost" size="sm" onClick={() => removeAttachment(index)}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+              <div className="space-y-6">
+                {[
+                  {
+                    label: 'Problem Statement/Requirement',
+                    value: problemStatement,
+                    onChange: setProblemStatement,
+                    placeholder: 'Enter the problem statement or requirement in detail',
+                  },
+                  {
+                    label: 'Root Cause & Objective',
+                    value: rootCause,
+                    onChange: setRootCause,
+                    placeholder: 'Describe the root cause and the objective',
+                  },
+                  {
+                    label: 'Review Remarks',
+                    value: reviewRemarks,
+                    onChange: setReviewRemarks,
+                    placeholder: 'Add your review remarks',
+                  },
+                  {
+                    label: 'Previous Review',
+                    value: previousReview,
+                    onChange: setPreviousReview,
+                    placeholder: 'Enter previous review details if any',
+                  },
+                  {
+                    label: 'Additional Notes',
+                    value: additionalNotes,
+                    onChange: setAdditionalNotes,
+                    placeholder: 'Add any additional notes or observations',
+                  },
+                ].map(({ label, value, onChange, placeholder }, idx) => (
+                  <motion.div key={idx} variants={itemVariants}>
+                    <label className="block text-lt-darkBlue font-medium mb-2">{label}</label>
+                    <Textarea
+                      value={value}
+                      onChange={(e) => onChange(e.target.value)}
+                      className="w-full h-32 resize-none focus:ring-2 focus:ring-lt-brightBlue"
+                      placeholder={placeholder}
+                    />
+                  </motion.div>
                 ))}
-            </motion.div>
 
-            <motion.div variants={itemVariants}>
-              <label className="block text-lt-darkBlue font-medium mb-2">Time Spent</label>
-              <div className="flex items-center">
-                <Input
-                  type="number"
-                  value={timeSpent}
-                  onChange={(e) => setTimeSpent(e.target.value)}
-                  className="max-w-[200px]"
-                  min="0"
-                />
-                <span className="ml-2 text-lt-grey">Minutes</span>
+                {/* Attachments */}
+                <motion.div variants={itemVariants}>
+                  <label className="block text-lt-darkBlue font-medium mb-2">Attachment Upload</label>
+                  <label className="lt-button-secondary inline-flex items-center cursor-pointer mb-3">
+                    <Paperclip className="w-4 h-4 mr-2" /> Upload Files
+                    <input type="file" multiple onChange={handleFileChange} className="hidden" />
+                  </label>
+
+                  {attachments.length > 0 &&
+                    attachments.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-lt-offWhite p-2 rounded mb-2">
+                        <span className="text-sm text-lt-grey truncate">{file.name}</span>
+                        <Button variant="ghost" size="sm" onClick={() => removeAttachment(index)}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                </motion.div>
+
+                {/* Time Spent */}
+                <motion.div variants={itemVariants}>
+                  <label className="block text-lt-darkBlue font-medium mb-2">Time Spent</label>
+                  <div className="flex items-center">
+                    <Input
+                      type="number"
+                      value={timeSpent}
+                      onChange={(e) => setTimeSpent(e.target.value)}
+                      className="max-w-[200px]"
+                      min="0"
+                    />
+                    <span className="ml-2 text-lt-grey">Minutes</span>
+                  </div>
+                </motion.div>
+
+                {/* Buttons */}
+                <motion.div variants={itemVariants} className="flex justify-end space-x-4">
+                  <Button className="lt-button-secondary" onClick={() => navigate('/response')}>
+                    Response
+                  </Button>
+                  <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }}>
+                    <Button className="lt-button-primary" disabled={loading} onClick={handleSubmit}>
+                      {loading ? 'Sending...' : 'Send'}
+                    </Button>
+                  </motion.div>
+                </motion.div>
               </div>
             </motion.div>
+          </div>
 
-            <motion.div variants={itemVariants} className="flex justify-end space-x-4">
-              <Button className="lt-button-secondary" onClick={() => navigate('/response')}>
-                Response
-              </Button>
-              <motion.div whileHover={{ scale: 1.03 }} transition={{ type: 'spring', stiffness: 400, damping: 10 }}>
-                <Button className="lt-button-primary" disabled={loading} onClick={handleSubmit}>
-                  {loading ? 'Sending...' : 'Send'}
-                </Button>
-              </motion.div>
+          {/* Side Panel */}
+          <div className="lg:col-span-1">
+            <motion.div className="bg-white rounded-lg shadow-lg p-6 sticky top-6" variants={itemVariants}>
+              <h3 className="text-lg font-semibold text-lt-darkBlue mb-4">Ticket Information</h3>
+              <div className="space-y-4">
+                {[
+                  { label: 'Date', value: date },
+                  { label: 'Type', value: type },
+                  { label: 'Domain', value: domain },
+                  { label: 'Search Term', value: searchTerm },
+                  { label: 'Transaction', value: transaction },
+                  { label: 'Status', value: status },
+                  { label: 'Age', value: age },
+                  
+                ].map(({ label, value }, idx) => (
+                  <div key={idx}>
+                    <p className="text-sm font-medium text-lt-darkBlue">{label}</p>
+                    <p className="text-sm text-lt-grey">{value}</p>
+                  </div>
+                ))}
+              </div>
             </motion.div>
           </div>
-          
-        </motion.div>
+        </div>
       </motion.div>
     </div>
   );
 };
+
 export default TicketDetails;

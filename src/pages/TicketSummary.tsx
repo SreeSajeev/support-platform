@@ -1102,7 +1102,7 @@ const TicketSummary: React.FC = () => {
   toast.success("Ticket summary saved successfully!");
   
   navigate('/ticket-details', {
-  state: { ticketId, requestedBy, date, status, age, domain, type, /* any others*/ }
+  state: { ticketId, requestedBy, date, status, age, domain, type, searchTerm, transaction }
 });
 
 } catch (error: any) {

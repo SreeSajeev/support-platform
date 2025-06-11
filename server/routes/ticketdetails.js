@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
 
 router.post('/', async (req, res) => {
   const {
-    TicketID,
+    
     ProblemStatement,
     RootCauseObjective,
     ReviewRemarks,
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
   try {
     const pool = await getPool();
     await pool.request()
-      .input('TicketID', sql.NVarChar, TicketID || '')
+      
       .input('ProblemStatement', sql.NVarChar, ProblemStatement)
       .input('RootCauseObjective', sql.NVarChar, RootCauseObjective)
       .input('ReviewRemarks', sql.NVarChar, ReviewRemarks)
@@ -68,12 +68,12 @@ router.post('/', async (req, res) => {
       .input('CreatedAt', sql.DateTime2, new Date(CreatedAt))
       .query(`
         INSERT INTO ticket_details (
-          TicketID, ProblemStatement, RootCauseObjective, ReviewRemarks,
+           ProblemStatement, RootCauseObjective, ReviewRemarks,
           PreviousReview, AdditionalNotes, TimeSpent,
           AttachmentFileName, AttachmentFilePath, CreatedAt
         )
         VALUES (
-          @TicketID, @ProblemStatement, @RootCauseObjective, @ReviewRemarks,
+           @ProblemStatement, @RootCauseObjective, @ReviewRemarks,
           @PreviousReview, @AdditionalNotes, @TimeSpent,
           @AttachmentFileName, @AttachmentFilePath, @CreatedAt
         )
