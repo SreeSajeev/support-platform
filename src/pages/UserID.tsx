@@ -30,15 +30,15 @@ const UserIdRequest: React.FC = () => {
   });
   
   // Form fields
-  const [otherApplication, setOtherApplication] = useState('');
-  const [username, setUsername] = useState('');
-  const [employeeNumber, setEmployeeNumber] = useState('');
-  const [designation, setDesignation] = useState('');
-  const [emailId, setEmailId] = useState('');
-  const [department, setDepartment] = useState('');
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [location, setLocation] = useState('');
-  const [reportingTo, setReportingTo] = useState('');
+  const [OtherApplication, setOtherApplication] = useState('');
+  const [Username, setUsername] = useState('');
+  const [Employee_ID, setEmployeeNumber] = useState('');
+  const [Designation, setDesignation] = useState('');
+  const [Email, setEmailId] = useState('');
+  const [Department, setDepartment] = useState('');
+  const [Mobile, setMobileNumber] = useState('');
+  const [Location, setLocation] = useState('');
+  const [Reporting_to, setReportingTo] = useState('');
   const [authorizationDetails, setAuthorizationDetails] = useState('');
 
   const handleAccessTypeChange = (type: keyof typeof accessTypes) => {
@@ -51,35 +51,35 @@ const UserIdRequest: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !employeeNumber || !emailId) {
+    if (!Username || !Employee_ID || !Email) {
       toast.error('Please fill in the required fields: Username, Employee ID, and Email ID.');
       return;
     }
     
     // Check if at least one access type is selected
-    const hasAccessType = Object.values(accessTypes).some(value => value) || otherApplication;
+    const hasAccessType = Object.values(accessTypes).some(value => value) || OtherApplication;
     if (!hasAccessType) {
       toast.error('Please select at least one access type or specify other application.');
       return;
     }
 
     try {
-      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/user-id-request', {
+      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/userid', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           accessTypes,
-          otherApplication,
-          username,
-          employeeNumber,
-          designation,
-          emailId,
-          department,
-          mobileNumber,
-          location,
-          reportingTo,
+          OtherApplication,
+          Username,
+          Employee_ID,
+          Designation,
+          Email, 
+          Department, 
+          Mobile, 
+          Location,
+          Reporting_to,
           authorizationDetails,
         }),
       });
@@ -251,9 +251,9 @@ const UserIdRequest: React.FC = () => {
                   id="otherApplication" 
                   className="form-input" 
                   placeholder="Specify other application if needed" 
-                  value={otherApplication}
+                  value={OtherApplication}
                   onChange={(e) => setOtherApplication(e.target.value)}
-                  onFocus={() => handleFocus('otherApplication')}
+                  onFocus={() => handleFocus('OtherApplication')}
                   onBlur={handleBlur}
                 />
                 <div className={`input-focus-indicator ${activeField === 'otherApplication' ? 'w-full' : 'w-0'}`}></div>
@@ -268,7 +268,7 @@ const UserIdRequest: React.FC = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative">
-                  <label htmlFor="username" className={`form-label block mb-2 ${activeField === 'username' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Username" className={`form-label block mb-2 ${activeField === 'username' ? 'text-lt-brightBlue' : ''}`}>
                     Username <span className="required-indicator">*</span>
                   </label>
                   <input 
@@ -277,7 +277,7 @@ const UserIdRequest: React.FC = () => {
                     className="form-input" 
                     placeholder="Enter username" 
                     required
-                    value={username}
+                    value={Username}
                     onChange={(e) => setUsername(e.target.value)}
                     onFocus={() => handleFocus('username')}
                     onBlur={handleBlur}
@@ -286,7 +286,7 @@ const UserIdRequest: React.FC = () => {
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="employeeNumber" className={`form-label block mb-2 ${activeField === 'employeeNumber' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Employee_ID" className={`form-label block mb-2 ${activeField === 'employeeNumber' ? 'text-lt-brightBlue' : ''}`}>
                     Employee ID / EX Number <span className="required-indicator">*</span>
                   </label>
                   <input 
@@ -295,26 +295,26 @@ const UserIdRequest: React.FC = () => {
                     className="form-input" 
                     placeholder="Enter employee ID" 
                     required
-                    value={employeeNumber}
+                    value={Employee_ID}
                     onChange={(e) => setEmployeeNumber(e.target.value)}
-                    onFocus={() => handleFocus('employeeNumber')}
+                    onFocus={() => handleFocus('Employee_ID')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'employeeNumber' ? 'w-full' : 'w-0'}`}></div>
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="designation" className={`form-label block mb-2 ${activeField === 'designation' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Designation" className={`form-label block mb-2 ${activeField === 'designation' ? 'text-lt-brightBlue' : ''}`}>
                     Grade / Designation
                   </label>
                   <input 
                     type="text" 
-                    id="designation" 
+                    id="Designation" 
                     className="form-input" 
                     placeholder="Enter designation" 
-                    value={designation}
+                    value={Designation}
                     onChange={(e) => setDesignation(e.target.value)}
-                    onFocus={() => handleFocus('designation')}
+                    onFocus={() => handleFocus('Designation')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'designation' ? 'w-full' : 'w-0'}`}></div>
@@ -326,81 +326,81 @@ const UserIdRequest: React.FC = () => {
                   </label>
                   <input 
                     type="email" 
-                    id="emailId" 
+                    id="Email" 
                     className="form-input" 
                     placeholder="Enter email address" 
                     required
-                    value={emailId}
+                    value={Email}
                     onChange={(e) => setEmailId(e.target.value)}
-                    onFocus={() => handleFocus('emailId')}
+                    onFocus={() => handleFocus('Email')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'emailId' ? 'w-full' : 'w-0'}`}></div>
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="department" className={`form-label block mb-2 ${activeField === 'department' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Department" className={`form-label block mb-2 ${activeField === 'department' ? 'text-lt-brightBlue' : ''}`}>
                     Department
                   </label>
                   <input 
                     type="text" 
-                    id="department" 
+                    id="Department" 
                     className="form-input" 
                     placeholder="Enter department" 
-                    value={department}
+                    value={Department}
                     onChange={(e) => setDepartment(e.target.value)}
-                    onFocus={() => handleFocus('department')}
+                    onFocus={() => handleFocus('Department')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'department' ? 'w-full' : 'w-0'}`}></div>
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="mobileNumber" className={`form-label block mb-2 ${activeField === 'mobileNumber' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Mobile" className={`form-label block mb-2 ${activeField === 'mobileNumber' ? 'text-lt-brightBlue' : ''}`}>
                     Mobile / Extn No
                   </label>
                   <input 
                     type="text" 
-                    id="mobileNumber" 
+                    id="Mobile" 
                     className="form-input" 
                     placeholder="Enter mobile number" 
-                    value={mobileNumber}
+                    value={Mobile}
                     onChange={(e) => setMobileNumber(e.target.value)}
-                    onFocus={() => handleFocus('mobileNumber')}
+                    onFocus={() => handleFocus('Mobile')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'mobileNumber' ? 'w-full' : 'w-0'}`}></div>
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="location" className={`form-label block mb-2 ${activeField === 'location' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Location" className={`form-label block mb-2 ${activeField === 'location' ? 'text-lt-brightBlue' : ''}`}>
                     Location
                   </label>
                   <input 
                     type="text" 
-                    id="location" 
+                    id="Location" 
                     className="form-input" 
                     placeholder="Enter location" 
-                    value={location}
+                    value={Location}
                     onChange={(e) => setLocation(e.target.value)}
-                    onFocus={() => handleFocus('location')}
+                    onFocus={() => handleFocus('Location')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'location' ? 'w-full' : 'w-0'}`}></div>
                 </div>
 
                 <div className="relative">
-                  <label htmlFor="reportingTo" className={`form-label block mb-2 ${activeField === 'reportingTo' ? 'text-lt-brightBlue' : ''}`}>
+                  <label htmlFor="Reporting_to" className={`form-label block mb-2 ${activeField === 'reportingTo' ? 'text-lt-brightBlue' : ''}`}>
                     Reporting to
                   </label>
                   <input 
                     type="text" 
-                    id="reportingTo" 
+                    id="Reporting_to" 
                     className="form-input" 
                     placeholder="Enter reporting manager" 
-                    value={reportingTo}
+                    value={Reporting_to}
                     onChange={(e) => setReportingTo(e.target.value)}
-                    onFocus={() => handleFocus('reportingTo')}
+                    onFocus={() => handleFocus('Reporting_to')}
                     onBlur={handleBlur}
                   />
                   <div className={`input-focus-indicator ${activeField === 'reportingTo' ? 'w-full' : 'w-0'}`}></div>

@@ -549,21 +549,16 @@ const ITHelpdeskView: React.FC = () => {
               <Download className="w-4 h-4" />
               Export CSV
             </Button>
-          </motion.div>
-           <div className="flex items-end gap-2">
-    <Button variant="outline" className="gap-2" onClick={handleSearch}>
-      <Search className="w-4 h-4" />
-      Search
-    </Button>
-
-    <Button
+             
+            <Button
       variant="secondary"  // Or "outline" or whatever your design system has
       className="gap-2"
       onClick={() => navigate('/it-performance-dashboard')}
     >
       IT Performance Dashboard
     </Button>
-  </div>
+          </motion.div>
+          
         </motion.div>
 
         <motion.div
