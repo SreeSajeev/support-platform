@@ -1,4 +1,204 @@
+import React, { useEffect, useState } from 'react';
+import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Clock } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
+interface Ticket {
+  id: string;
+  domain: string;
+  Type: string;
+  psNumber: string;
+  currentStatus: string;
+  createdAt: string;
+  assignedTo: string;
+  priority: string;
+  ResolutionDate: string;
+  ResolutionTime: number;
+  SLACompliance: string;
+}
+
+const AssignedTickets: React.FC = () => {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'psNumber'>('latest');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'in-progress' | 'resolved' | 'closed'>('all');
+
+  const navigate = useNavigate();
+  const assignedTo = 'Alice Johnson'; // Or get dynamically from auth/session
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const res = await fetch(`https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/previously-submitted-tickets?assignedTo=${encodeURIComponent(assignedTo)}`);
+        if (!res.ok) throw new Error('Failed to fetch tickets');
+        const data: Ticket[] = await res.json();
+        setTickets(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTickets();
+  }, []);
+
+  const formatDate = (s: string) =>
+    new Date(s).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
+      case 'in progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'open': return 'bg-red-100 text-red-800 border-red-200';
+      case 'closed': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    }
+  };
+
+  const filteredAndSorted = tickets
+    .filter(t => filterStatus === 'all' || t.currentStatus.toLowerCase().replace(' ', '-') === filterStatus)
+    .sort((a, b) => {
+      if (sortBy === 'latest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return a.psNumber.localeCompare(b.psNumber);
+    });
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    }
+  };
+     
+
+  if (loading) return <div className="p-6 text-center text-gray-600">Loading tickets...</div>;
+  if (error) return <div className="p-6 text-center text-red-500">Error: {error}</div>;
+
+  return (
+    
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header title="IT HELPDESK" />
+      
+      <motion.div 
+        className="container mx-auto py-6 px-4 flex-grow max-w-6xl"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+     
+        <div className="relative w-full h-full">
+            <motion.button
+                onClick={() => navigate('/')}
+                className="absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center z-50"
+                whileHover={{ x: -5 }}
+                whileTap={{ scale: 0.97 }}
+                variants={itemVariants}
+            >
+                <ArrowLeft className="w-6 h-6 mr-1" />
+                <span className="text-sm font-medium">Back to Helpdesk</span>
+            </motion.button>
+        </div>
+        <motion.div 
+          className="text-center mb-8"
+          variants={itemVariants}
+        >
+          <h1 className="text-3xl md:text-4xl font-light text-blue-900 mb-2">My Previously Submitted Tickets</h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Track all your reported issues and their history here
+          </p>
+        </motion.div>
+
+    
+      <motion.div className="container mx-auto py-6 px-4 max-w-5xl">
+        
+
+        <div className="flex flex-wrap gap-4 items-center justify-between mb-4">
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              Sort by:
+              <select className="border p-1 text-sm" value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
+                <option value="latest">Latest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="psNumber">PS Number</option>
+              </select>
+            </label>
+
+            <label className="flex items-center gap-2 text-sm">
+              Filter:
+              <select className="border p-1 text-sm" value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)}>
+                <option value="all">All</option>
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+                <option value="closed">Closed</option>
+              </select>
+            </label>
+          </div>
+
+          <span className="text-sm text-gray-600">{filteredAndSorted.length} ticket(s)</span>
+        </div>
+
+        {filteredAndSorted.length === 0 ? (
+          <div className="bg-white p-6 rounded shadow text-center text-gray-500">
+            No tickets found for "{assignedTo}".
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredAndSorted.map(ticket => (
+              <div key={ticket.id} className="bg-white p-4 rounded shadow border border-gray-200 hover:shadow-md transition">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-mono text-xs text-blue-600">{ticket.id}</span>
+                      <Badge className={`text-xs ${getStatusColor(ticket.currentStatus)}`}>
+                        {ticket.currentStatus}
+                      </Badge>
+                    </div>
+                    <div className="text-gray-800 font-semibold mb-1">{ticket.Type}</div>
+                    <div className="text-sm text-gray-600 flex flex-wrap gap-3">
+                      <span>{ticket.domain}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {formatDate(ticket.createdAt)}</span>
+                      <span>PS: {ticket.psNumber}</span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-right text-gray-500">
+                    <div>Priority: {ticket.priority}</div>
+                    <div>SLA: {ticket.SLACompliance}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default AssignedTickets;
+
+{/*}
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
@@ -193,7 +393,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Page Header */}
+     
         <div className="relative w-full h-full">
             <motion.button
                 onClick={() => navigate('/')}
@@ -216,7 +416,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Filters and Sorting */}
+        
         <motion.div 
           className="bg-white rounded-lg shadow-sm p-4 mb-6"
           variants={itemVariants}
@@ -256,7 +456,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Tickets List */}
+       
         <motion.div 
           className="space-y-4"
           variants={containerVariants}
@@ -292,7 +492,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="text-sm font-medium text-blue-600">{ticket.id}</span>
-                          <Badge className={`text-xs ${getStatusColor(ticket.currentStatus)}`}>
+                          <Badge className={text-xs ${getStatusColor(ticket.currentStatus)}}>
                             {getStatusIcon(ticket.currentStatus)} {ticket.currentStatus}
                           </Badge>
                         </div>
@@ -324,7 +524,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
 
                   <CollapsibleContent className="border-t border-gray-100">
                     <div className="p-6 space-y-6">
-                      {/* Ticket Details */}
+                   
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2">Problem Details</h4>
@@ -366,7 +566,7 @@ const PreviouslySubmittedTickets: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Ticket History */}
+                      
                       <div>
                         <h4 className="font-semibold text-gray-900 mb-4">Ticket History</h4>
                         {ticket.history.length === 0 ? (
@@ -381,11 +581,11 @@ const PreviouslySubmittedTickets: React.FC = () => {
                                 <div className="bg-gray-50 rounded-lg p-4">
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                                     <div className="flex items-center gap-2">
-                                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(update.oldStatus)}`}>
+                                      <span className={px-2 py-1 rounded text-xs font-medium ${getStatusColor(update.oldStatus)}}>
                                         {update.oldStatus}
                                       </span>
                                       <ArrowRight className="w-3 h-3 text-gray-400" />
-                                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(update.newStatus)}`}>
+                                      <span className={px-2 py-1 rounded text-xs font-medium ${getStatusColor(update.newStatus)}}>
                                         {update.newStatus}
                                       </span>
                                     </div>
@@ -424,6 +624,6 @@ const PreviouslySubmittedTickets: React.FC = () => {
       </footer>
     </div>
   );
+  
 };
-
-export default PreviouslySubmittedTickets;
+*/}
