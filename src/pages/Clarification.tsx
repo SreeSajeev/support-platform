@@ -16,6 +16,10 @@ const Clarification: React.FC = () => {
   const [transactionPath, setTransactionPath] = useState('');
   const [problemStatement, setProblemStatement] = useState('');
   const [domain, setDomain] = useState('');
+  const [reportedBy, setReportedBy] = useState('');
+  const [psNumber, setPsNumber] = useState('');
+  const [problemID, setProblemID] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -36,6 +40,10 @@ const Clarification: React.FC = () => {
         domain,
         problemStatement,
         fileName,
+        reportedBy,
+        psNumber,
+        email,
+        problemID,
       }),
     });
 
@@ -51,7 +59,11 @@ const Clarification: React.FC = () => {
     setProblemDescription('');
     setDomain('');
     setProblemStatement('');
+    setReportedBy('');
+    setPsNumber('');
+    setEmail('');
     setFileName('');
+    setProblemID('');
   } catch (error) {
     console.error('❌ Error submitting form:', error);
     toast.error('Something went wrong while submitting.');
@@ -134,6 +146,78 @@ const Clarification: React.FC = () => {
           </motion.button>
 
           <form onSubmit={handleSubmit} className="pt-12">
+            
+            {/* New Field: Reported By */}
+            <div className="mb-6 relative">
+              <label htmlFor="reportedBy" className={`form-label block mb-2 ${activeField === 'reportedBy' ? 'text-lt-brightBlue' : ''}`}>
+                Name (Reported By)
+              </label>
+              <input 
+                type="text" 
+                id="reportedBy" 
+                className="form-input" 
+                placeholder="Enter your name" 
+                value={reportedBy}
+                onChange={(e) => setReportedBy(e.target.value)}
+                onFocus={() => handleFocus('reportedBy')}
+                onBlur={handleBlur}
+              />
+              <div className={`input-focus-indicator ${activeField === 'reportedBy' ? 'w-full' : 'w-0'}`}></div>
+            </div>
+
+            {/* New Field: PS Number */}
+            <div className="mb-6 relative">
+              <label htmlFor="psNumber" className={`form-label block mb-2 ${activeField === 'psNumber' ? 'text-lt-brightBlue' : ''}`}>
+                PS Number
+              </label>
+              <input 
+                type="text" 
+                id="psNumber" 
+                className="form-input" 
+                placeholder="Enter your PS number" 
+                value={psNumber}
+                onChange={(e) => setPsNumber(e.target.value)}
+                onFocus={() => handleFocus('psNumber')}
+                onBlur={handleBlur}
+              />
+              <div className={`input-focus-indicator ${activeField === 'psNumber' ? 'w-full' : 'w-0'}`}></div>
+            </div>
+
+            {/* New Field: Email */}
+            <div className="mb-6 relative">
+              <label htmlFor="email" className={`form-label block mb-2 ${activeField === 'email' ? 'text-lt-brightBlue' : ''}`}>
+                Email
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                className="form-input" 
+                placeholder="Enter your email address" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => handleFocus('email')}
+                onBlur={handleBlur}
+              />
+              <div className={`input-focus-indicator ${activeField === 'email' ? 'w-full' : 'w-0'}`}></div>
+            </div>
+            
+            {/* New Field: ProblemID */}
+            <div className="mb-6 relative">
+              <label htmlFor="problemID" className={`form-label block mb-2 ${activeField === 'problemID' ? 'text-lt-brightBlue' : ''}`}>
+                Problem ID
+              </label>
+              <input 
+                type="text" 
+                id="problemID" 
+                className="form-input" 
+                placeholder="Enter your Problem ID" 
+                value={problemID}
+                onChange={(e) => setProblemID(e.target.value)}
+                onFocus={() => handleFocus('problemID')}
+                onBlur={handleBlur}
+              />
+              <div className={`input-focus-indicator ${activeField === 'psNumber' ? 'w-full' : 'w-0'}`}></div>
+            </div>
             {/* Problem Description */}
             <motion.div className="mb-6 relative" variants={itemVariants}>
               <label
@@ -142,7 +226,7 @@ const Clarification: React.FC = () => {
                   activeField === 'problemDescription' ? 'text-lt-brightBlue' : ''
                 }`}
               >
-                Problem Description <span className="text-red-500">*</span>
+                Clarification Description <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -156,32 +240,26 @@ const Clarification: React.FC = () => {
                 required
               />
             </motion.div>
-
-            {/* Select Domain */}
-            <motion.div className="mb-6 relative" variants={itemVariants}>
-              <label
-                htmlFor="domain"
-                className={`form-label block mb-2 text-lt-darkBlue ${
-                  activeField === 'domain' ? 'text-lt-brightBlue' : ''
-                }`}
-              >
-                Domain <span className="text-red-500">*</span>
+            <div className="mb-6 relative">
+              <label htmlFor="domain" className={`form-label block mb-2 ${activeField === 'domain' ? 'text-lt-brightBlue' : ''}`}>
+                Domain
               </label>
-              <select
-                id="domain"
-                className="form-input form-select border border-lt-lightGrey rounded-md px-4 py-2 w-full bg-white"
+              <select 
+                id="domain" 
+                className="form-input form-select" 
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 onFocus={() => handleFocus('domain')}
                 onBlur={handleBlur}
               >
                 <option value="">Select Domain</option>
-                <option value="IT Infrastructure">IT Infrastructure</option>
-                <option value="Software">Software</option>
-                <option value="Hardware">Hardware</option>
-                <option value="Network">Network</option>
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Application">Application</option>
               </select>
-            </motion.div>
+              <div className={`input-focus-indicator ${activeField === 'domain' ? 'w-full' : 'w-0'}`}></div>
+            </div>
+
+           
 
             {/* Problem Statement */}
             <motion.div className="mb-6 relative" variants={itemVariants}>
@@ -191,7 +269,7 @@ const Clarification: React.FC = () => {
                   activeField === 'problemStatement' ? 'text-lt-brightBlue' : ''
                 }`}
               >
-                Problem Statement 
+                Clarification Statement 
               </label>
               <textarea
                 id="problemStatement"

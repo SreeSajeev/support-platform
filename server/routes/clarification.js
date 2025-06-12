@@ -21,10 +21,13 @@ router.post('/', async (req, res) => {
 
   const { problemDescription, domain, problemStatement, attachmentPath } = req.body;
 
-  if (!problemDescription || !domain) {
+  if (!problemDescription || !domain||!reportedBy || !psNumber || !email) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  
+  // Generate unique Problem ID
+  const clarificationID = `RP${Math.floor(100000 + Math.random() * 900000)}`;
   try {
     const pool = await sql.connect(config);
 
@@ -33,21 +36,36 @@ router.post('/', async (req, res) => {
       .input('domain', sql.NVarChar, domain)
       .input('problemStatement', sql.NVarChar, problemStatement)
       .input('attachmentPath', sql.NVarChar, attachmentPath)
-      .query(`INSERT INTO clarification (ProblemDescription, Domain, ProblemStatement, AttachmentPath) 
-              VALUES (@problemDescription, @domain, @problemStatement, @attachmentPath)`);
+      .input('reportedBy', sql.NVarChar, reportedBy)
+      .input('psNumber', sql.NVarChar, psNumber)
+      .input('email', sql.NVarChar, email)
+      .query(`INSERT INTO clarification (clarificationID,ProblemDescription, Domain, ProblemStatement, AttachmentPath,reportedBy, psNumber, email) 
+              VALUES (@clarificationID,@problemDescription, @domain, @problemStatement, @attachmentPath,@reportedBy, @psNumber, @email)`);
 
-    await pool.close();
 
-    res.json({ message: 'Clarification Ticket submitted successfully' });
+    // Email acknowledgment
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'evakerenskyishere@gmail.com',         // replace with your Gmail
+        pass: 'vaub huvm rggk scrt',      // use Gmail app password
+      },
+    });
+
+    const mailOptions = {
+      from: 'evakerenskyishere@gmail.com',
+      to: email,
+      subject: 'Clarification Confirmation',
+      text: `Thank you for reporting a clarification to your problem. Your ClarificationID is  ${problemID}. We will get back to you shortly with a resolution!`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ message: 'Problem reported successfully', problemID });
   } catch (err) {
-    console.error('DB insert error:', err);
-    res.status(500).json({ error: 'Failed to save clarification ticket' });
+    console.error('❌ Error:', err);
+    return res.status(500).json({ error: 'Something went wrong while reporting the problem.' });
   }
-});
-
-// Health check endpoint
-router.get('/', (req, res) => {
-  res.send('✅ Clarification endpoint is live and reachable via GET');
 });
 
 module.exports = router;
