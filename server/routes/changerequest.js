@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
+const nodemailer = require('nodemailer');
 
 // SQL Server config
 const config = {
@@ -10,16 +11,54 @@ const config = {
   database: 'supportDB',
   options: {
     encrypt: true,
-    trustServerCertificate: false, // Set to true only for local testing with self-signed certs
+    trustServerCertificate: false,
   },
 };
 
+let pool;
+async function getPool() {
+  if (pool) return pool;
+  pool = await sql.connect(config);
+  console.log('✅ Connected to Azure SQL');
+  return pool;
+}
+
+// Get user info based on email
+router.get('/user-info', async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email query param is required' });
+  }
+
+  try {
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('email', sql.NVarChar, email)
+      .query(`
+        SELECT name AS reportedBy, email
+        FROM Users
+        WHERE email = @email
+      `);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json(result.recordset[0]);
+  } catch (err) {
+    console.error('❌ Error fetching user info:', err);
+    return res.status(500).json({ error: 'Server error fetching user info' });
+  }
+});
+
+// POST change request
 router.post('/', async (req, res) => {
   const {
     requestedBy,
+    email,
     date,
     contactDetails,
-    email,
     attachmentPath,
     problemStatement,
     currentMethod,
@@ -30,75 +69,96 @@ router.post('/', async (req, res) => {
     functionHeadEmail,
   } = req.body;
 
-  // Log input for debugging
-  console.log('🔔 /api/change-requests POST endpoint hit!');
-  console.log('📦 Received body:', req.body);
-  
-  
-  // Basic field validation
-  if (!requestedBy || !date || !problemStatement) {
-    return res.status(400).json({ error: 'Please provide requestedBy, date, and problemStatement.' });
+  // Input validation
+  if (!email || !date || !problemStatement) {
+    return res.status(400).json({ error: 'Email, date, and problem statement are required.' });
   }
 
+  const problemID = `RP${Math.floor(100000 + Math.random() * 900000)}`;
+
   try {
-    // Connect to MSSQL
-    const pool = await sql.connect(config);
+    const pool = await getPool();
 
-      await pool.request()
-    .input('requestedBy', sql.NVarChar, requestedBy)
-    .input('requestDate', sql.Date, date)  // RequestDate not "date"
-    .input('contactDetails', sql.NVarChar, contactDetails || null)
-    .input('email', sql.NVarChar, email || null)
-    .input('attachmentPath', sql.NVarChar, attachmentPath || null)
-    .input('problemStatement', sql.NVarChar, problemStatement)
-    .input('currentMethod', sql.NVarChar, currentMethod || null)
-    .input('proposedProcess', sql.NVarChar, proposedNewProcess || null) // ProposedProcess, not proposedNewProcess
-    .input('expectedOutcome', sql.NVarChar, expectedOutcome || null)
-    .input('benefits', sql.NVarChar, benefits || null)
-    .input('consequencesIfNotChanged', sql.NVarChar, consequences || null) // ConsequencesIfNotChanged, not consequences
-    .input('functionHeadEmail', sql.NVarChar, functionHeadEmail || null)
-    .query(`
-      INSERT INTO changerequests (
-        RequestedBy,
-        RequestDate,
-        ContactDetails,
-        Email,
-        AttachmentPath,
-        ProblemStatement,
-        CurrentMethod,
-        ProposedProcess,
-        ExpectedOutcome,
-        Benefits,
-        ConsequencesIfNotChanged,
-        FunctionHeadEmail
-      ) VALUES (
-        @requestedBy,
-        @requestDate,
-        @contactDetails,
-        @email,
-        @attachmentPath,
-        @problemStatement,
-        @currentMethod,
-        @proposedProcess,
-        @expectedOutcome,
-        @benefits,
-        @consequencesIfNotChanged,
-        @functionHeadEmail
-      )
-    `);
+    // Get name from Users table
+    const result = await pool.request()
+      .input('email', sql.NVarChar, email)
+      .query(`SELECT name FROM Users WHERE email = @email`);
 
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'User not found in Users table.' });
+    }
 
-   
-    res.status(201).json({ message: 'Change request submitted successfully.' });
-    console.log('✅ Rows affected:', result.rowsAffected); // should be [1]
-    console.log('✅ Insert successful');
+    const { name: reportedBy } = result.recordset[0];
 
-  } catch (error) {
-    console.error('DB insert error:', error.stack || error);
-    res.status(500).json({ error: 'Failed to submit change request.', details: error.message || error });
-  
-  } finally {
-    await sql.close(); // Always close after use
+    // Insert into changeRequests table
+    await pool.request()
+     
+      .input('RequestDate', sql.Date, date)
+      .input('RequestedBy', sql.NVarChar, requestedBy)
+      .input('Email', sql.NVarChar, email)
+      .input('ContactDetails', sql.NVarChar, contactDetails || null)
+      .input('AttachmentPath', sql.NVarChar, attachmentPath || null)
+      .input('ProblemStatement', sql.NVarChar, problemStatement)
+      .input('CurrentMethod', sql.NVarChar, currentMethod || null)
+      .input('ProposedProcess', sql.NVarChar, proposedNewProcess || null)
+      .input('ExpectedOutcome', sql.NVarChar, expectedOutcome || null)
+      .input('Benefits', sql.NVarChar, benefits || null)
+      .input('ConsequencesIfNotChanged', sql.NVarChar, consequences || null)
+      .input('FunctionHeadEmail', sql.NVarChar, functionHeadEmail || null)
+      .query(`
+        INSERT INTO changeRequests (
+          
+          RequestDate,
+          RequestedBy,
+          Email,
+          ContactDetails,
+          AttachmentPath,
+          ProblemStatement,
+          CurrentMethod,
+          ProposedProcess,
+          ExpectedOutcome,
+          Benefits,
+          ConsequencesIfNotChanged,
+          FunctionHeadEmail
+        ) VALUES (
+          
+          @RequestDate,
+          @RequestedBy,
+          @Email,
+          @ContactDetails,
+          @AttachmentPath,
+          @ProblemStatement,
+          @CurrentMethod,
+          @ProposedProcess,
+          @ExpectedOutcome,
+          @Benefits,
+          @ConsequencesIfNotChanged,
+          @FunctionHeadEmail
+        )
+      `);
+
+    // Send confirmation email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'evakerenskyishere@gmail.com',
+        pass: 'vaub huvm rggk scrt',
+      },
+    });
+
+    const mailOptions = {
+      from: 'evakerenskyishere@gmail.com',
+      to: email,
+      subject: 'Change Requests Confirmation',
+      text: `Dear ${requestedBy},\n\nThank you for submitting your Change Requests request. We will get back to you shortly with a resolution!\n\n- Support Team`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ message: 'Submitted successfully' });
+  } catch (err) {
+    console.error('❌ Error:', err);
+    return res.status(500).json({ error: 'Something went wrong while submitting the request.' });
   }
 });
 

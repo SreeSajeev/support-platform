@@ -19,10 +19,6 @@ async function getPool() {
   return pool;
 }
 
-
-
-
-
 router.get('/', async (req, res) => {
   const { assignedTo } = req.query;
   if (!assignedTo) {

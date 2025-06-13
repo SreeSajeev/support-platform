@@ -145,7 +145,7 @@ const EscalationMatrix: React.FC = () => {
       >
         <motion.div variants={itemVariants}>
           <Button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/index')}
             variant="ghost" 
             className="mb-4 text-lt-darkBlue hover:text-lt-brightBlue"
           >

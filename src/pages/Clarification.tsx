@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { ArrowLeft, HelpCircle, Upload } from 'lucide-react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const Clarification: React.FC = () => {
   const navigate = useNavigate();
@@ -21,10 +26,29 @@ const Clarification: React.FC = () => {
   const [problemID, setProblemID] = useState('');
   const [email, setEmail] = useState('');
 
+   // Fetch user from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setReportedBy(user.name || '');
+        setPsNumber(user.psNumber || '');
+        setEmail(user.email || '');
+      } catch (err) {
+        console.error('Invalid user data in localStorage', err);
+        toast.error('User data could not be loaded.');
+      }
+    } else {
+      toast.error('You are not logged in.');
+    }
+  }, []);
+
+
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  if (!problemDescription || !domain) {
+  if (!problemDescription || !domain ||!problemID) {
     toast.error('Please fill in all required fields.');
     return;
   }
@@ -47,29 +71,30 @@ const Clarification: React.FC = () => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      toast.error(`Submission failed: ${errorData.error}`);
-      return;
+    if (response.ok) {
+      const data = await response.json();
+      toast.success('clarification reported successfully!');
+      alert(`Thank you for Submitting the clarification. `);
+      // Optionally reset form
+      setProblemDescription('');
+      setDomain('');
+      setProblemStatement('');
+      setReportedBy('');
+      setPsNumber('');
+      setEmail('');
+      setFileName('');
+      setProblemID('');
+
     }
-
-    toast.success('Your clarification request has been submitted successfully!');
-    
-    // Optionally reset form
-    setProblemDescription('');
-    setDomain('');
-    setProblemStatement('');
-    setReportedBy('');
-    setPsNumber('');
-    setEmail('');
-    setFileName('');
-    setProblemID('');
-  } catch (error) {
-    console.error('❌ Error submitting form:', error);
-    toast.error('Something went wrong while submitting.');
-  }
+     else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to report ');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong.');
+    }
 };
-
 
   const handleFocus = (fieldName: string) => setActiveField(fieldName);
   const handleBlur = () => setActiveField(null);
@@ -133,7 +158,7 @@ const Clarification: React.FC = () => {
           animate="visible"
         >
           <motion.button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/index')}
             className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
@@ -147,59 +172,36 @@ const Clarification: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="pt-12">
             
-            {/* New Field: Reported By */}
-            <div className="mb-6 relative">
-              <label htmlFor="reportedBy" className={`form-label block mb-2 ${activeField === 'reportedBy' ? 'text-lt-brightBlue' : ''}`}>
-                Name (Reported By)
-              </label>
-              <input 
-                type="text" 
-                id="reportedBy" 
-                className="form-input" 
-                placeholder="Enter your name" 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label className="form-label block mb-1">Name (Reported By)</label>
+              <input
+                type="text"
+                className="form-input bg-gray-100 cursor-not-allowed"
                 value={reportedBy}
-                onChange={(e) => setReportedBy(e.target.value)}
-                onFocus={() => handleFocus('reportedBy')}
-                onBlur={handleBlur}
+                readOnly
               />
-              <div className={`input-focus-indicator ${activeField === 'reportedBy' ? 'w-full' : 'w-0'}`}></div>
             </div>
-
-            {/* New Field: PS Number */}
-            <div className="mb-6 relative">
-              <label htmlFor="psNumber" className={`form-label block mb-2 ${activeField === 'psNumber' ? 'text-lt-brightBlue' : ''}`}>
-                PS Number
-              </label>
-              <input 
-                type="text" 
-                id="psNumber" 
-                className="form-input" 
-                placeholder="Enter your PS number" 
+            <div>
+              <label className="form-label block mb-1">PS Number</label>
+              <input
+                type="text"
+                className="form-input bg-gray-100 cursor-not-allowed"
                 value={psNumber}
-                onChange={(e) => setPsNumber(e.target.value)}
-                onFocus={() => handleFocus('psNumber')}
-                onBlur={handleBlur}
+                readOnly
               />
-              <div className={`input-focus-indicator ${activeField === 'psNumber' ? 'w-full' : 'w-0'}`}></div>
             </div>
 
-            {/* New Field: Email */}
-            <div className="mb-6 relative">
-              <label htmlFor="email" className={`form-label block mb-2 ${activeField === 'email' ? 'text-lt-brightBlue' : ''}`}>
-                Email
-              </label>
-              <input 
-                type="email" 
-                id="email" 
-                className="form-input" 
-                placeholder="Enter your email address" 
+            <div>
+              <label className="form-label block mb-1">Email</label>
+              <input
+                type="email"
+                className="form-input bg-gray-100 cursor-not-allowed"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={() => handleFocus('email')}
-                onBlur={handleBlur}
+                readOnly
               />
-              <div className={`input-focus-indicator ${activeField === 'email' ? 'w-full' : 'w-0'}`}></div>
             </div>
+          </div>
             
             {/* New Field: ProblemID */}
             <div className="mb-6 relative">
@@ -218,6 +220,7 @@ const Clarification: React.FC = () => {
               />
               <div className={`input-focus-indicator ${activeField === 'psNumber' ? 'w-full' : 'w-0'}`}></div>
             </div>
+          
             {/* Problem Description */}
             <motion.div className="mb-6 relative" variants={itemVariants}>
               <label

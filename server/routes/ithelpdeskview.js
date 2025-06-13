@@ -33,44 +33,6 @@ router.get('/', (req, res) => {
   res.send('🛠️ IT Helpdesk View API is running!');
 });
 
-{/*} GET route to fetch tickets (with optional filtering)
-router.get('/tickets', async (req, res) => {
-  try {
-    const { issueType, psNumber, status } = req.query;
-
-    const pool = await getPool();
-    let query = 'SELECT * FROM Tickets WHERE 1=1';
-    
-    if (issueType) query += ` AND issueType = @issueType`;
-    if (psNumber) query += ` AND psNumber = @psNumber`;
-    if (status) query += ` AND status = @status`;
-
-    const request = pool.request();
-    if (issueType) request.input('issueType', sql.NVarChar, issueType);
-    if (psNumber) request.input('psNumber', sql.NVarChar, psNumber);
-    if (status) request.input('status', sql.NVarChar, status);
-
-    const result = await request.query(query + ' ORDER BY createdAt DESC');
-
-    res.status(200).json(result.recordset);
-  } catch (err) {
-    console.error('❌ Error fetching tickets:', err);
-    res.status(500).json({ error: 'Failed to fetch tickets' });
-  }
-
-  // GET route to fetch problems
-router.get('/problems', async (req, res) => {
-  try {
-    const pool = await getPool();
-    const query = `SELECT * FROM problems ORDER BY created_at DESC`;
-    const result = await pool.request().query(query);
-    res.status(200).json(result.recordset);
-  } catch (err) {
-    console.error('❌ Error fetching problems:', err);
-    res.status(500).json({ error: 'Failed to fetch problems' });
-  }
-});
-*/}
 // GET route to fetch all tickets from the view
 router.get('/tickets', async (req, res) => {
   try {

@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Upload } from 'lucide-react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 
 const ChangeRequest: React.FC = () => {
   const navigate = useNavigate();
@@ -24,15 +30,22 @@ const ChangeRequest: React.FC = () => {
   const [consequences, setConsequences] = useState('');
   const [functionHeadEmail, setFunctionHeadEmail] = useState('');
 
-  const handleFocus = (fieldName: string) => setActiveField(fieldName);
-  const handleBlur = () => setActiveField(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFileName(e.target.files[0].name);
-      toast.info(`File "${e.target.files[0].name}" selected.`);
+  useEffect(() => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      const user = JSON.parse(storedUser);
+      setRequestedBy(user.name || '');
+      setEmail(user.email || '');
+    } catch (err) {
+      console.error('Invalid user data in localStorage', err);
+      toast.error('User data could not be loaded.');
     }
-  };
+  } else {
+    toast.error('You are not logged in.');
+  }
+}, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,29 +75,43 @@ const ChangeRequest: React.FC = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(`Submission failed: ${errorData.error}`);
-        return;
-      }
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('Problem reported successfully!');
+        alert(`Thank you for Submitting Change Request.`);
 
-      toast.success(' Change request submitted successfully!');
-      // Reset form
-      setRequestedBy('');
-      setDate('');
-      setContactDetails('');
-      setEmail('');
-      setProblemStatement('');
-      setCurrentMethod('');
-      setProposedProcess('');
-      setExpectedOutcome('');
-      setBenefits('');
-      setConsequences('');
-      setFunctionHeadEmail('');
-      setFileName('');
-    } catch (error) {
-      console.error('❌ Error submitting form:', error);
-      toast.error('Something went wrong while submitting.');
+
+        toast.success(' Change request submitted successfully!');
+        // Reset form
+   
+        setDate('');
+        setContactDetails('');
+     
+        setProblemStatement('');
+        setCurrentMethod('');
+        setProposedProcess('');
+        setExpectedOutcome('');
+        setBenefits('');
+        setConsequences('');
+        setFunctionHeadEmail('');
+        setFileName('');
+      }  else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to report problem.');
+      } 
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong.');
+    }
+  };
+  const handleFocus = (fieldName: string) => setActiveField(fieldName);
+  const handleBlur = () => setActiveField(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setFileName(file.name);
+      toast.info(`File "${file.name}" selected.`);
     }
   };
 
@@ -153,25 +180,26 @@ const ChangeRequest: React.FC = () => {
                     </motion.button>
           
           <form onSubmit={handleSubmit} className="pt-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <motion.div className="relative" variants={itemVariants}>
-                <label htmlFor="requestedBy" className={`form-label block mb-2 text-white ${activeField === 'requestedBy' ? 'text-lt-brightBlue' : ''}`}>
-                  Requested By <span className="text-red-500 required-indicator">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  id="requestedBy" 
-                  className="form-input" 
-                  placeholder="Enter your name" 
-                  required
-                  value={requestedBy}
-                  onChange={(e) => setRequestedBy(e.target.value)}
-                  onFocus={() => handleFocus('requestedBy')}
-                  onBlur={handleBlur}
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div>
+              <label className="form-label block mb-1">RequestedBy</label>
+              <input
+                type="text"
+                className="form-input bg-gray-100 cursor-not-allowed"
+                value={requestedBy}
+                readOnly
                 />
-                <div className={`input-focus-indicator ${activeField === 'requestedBy' ? 'w-full' : 'w-0'}`}></div>
-              </motion.div>
-              
+              </div>
+              <div>
+              <label className="form-label block mb-1">Email</label>
+              <input
+                type="email"
+                className="form-input bg-gray-100 cursor-not-allowed"
+                value={email}
+                readOnly
+                />
+              </div>
+            
               <motion.div className="relative" variants={itemVariants}>
                 <label htmlFor="date" className={`form-label block mb-2 text-white ${activeField === 'date' ? 'text-lt-brightBlue' : ''}`}>
                   Date <span className="text-red-500 required-indicator">*</span>
@@ -208,22 +236,6 @@ const ChangeRequest: React.FC = () => {
                 <div className={`input-focus-indicator ${activeField === 'contactDetails' ? 'w-full' : 'w-0'}`}></div>
               </motion.div>
               
-              <motion.div className="relative" variants={itemVariants}>
-                <label htmlFor="email" className={`form-label block mb-2 text-white ${activeField === 'email' ? 'text-lt-brightBlue' : ''}`}>
-                  Email
-                </label>
-                <input 
-                  type="email" 
-                  id="email" 
-                  className="form-input" 
-                  placeholder="Enter email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => handleFocus('email')}
-                  onBlur={handleBlur}
-                />
-                <div className={`input-focus-indicator ${activeField === 'email' ? 'w-full' : 'w-0'}`}></div>
-              </motion.div>
             </div>
             
             <motion.div className="mb-6 relative" variants={itemVariants}>
