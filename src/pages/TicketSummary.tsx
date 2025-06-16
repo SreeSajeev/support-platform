@@ -1071,7 +1071,7 @@ const TicketSummary: React.FC = () => {
     };
   console.log("Payload being sent:", payload);
 
-  const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/ticket-summary/', {
+  const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-summary/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

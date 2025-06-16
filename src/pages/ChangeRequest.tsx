@@ -56,7 +56,7 @@ const ChangeRequest: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/change-requests', {
+      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/change-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -167,7 +167,7 @@ const ChangeRequest: React.FC = () => {
           animate="visible"
         >
            <motion.button
-                      onClick={() => navigate('/')}
+                      onClick={() => navigate('/index')}
                       className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
                       onMouseEnter={() => setIsHovering(true)}
                       onMouseLeave={() => setIsHovering(false)}

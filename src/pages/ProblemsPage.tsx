@@ -24,7 +24,7 @@ const ProblemsPage: React.FC = () => {
     const fetchProblems = async () => {
       setLoading(true);
       try {
-        const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/problems');
+        const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/problems');
 
         if (!response.ok) throw new Error('Failed to fetch problems');
         const data = await response.json();

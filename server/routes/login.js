@@ -10,14 +10,30 @@ const config = {
   database: 'supportDB',
   options: { encrypt: true, trustServerCertificate: false }
 };
-
 let pool;
+
 async function getPool() {
-  if (pool) return pool;
-  pool = await sql.connect(config);
-  console.log("📌 Connected to Azure SQL ");
-  return pool;
+  if (pool) {
+    try {
+      await pool.request().query('SELECT 1');
+      return pool;
+    } catch (err) {
+      console.warn('⚠️ Reconnecting to SQL Server...');
+      await pool.close().catch(() => {});
+      pool = null;
+    }
+  }
+
+  try {
+    pool = await sql.connect(config);
+    console.log('✅ Connected to Azure SQL');
+    return pool;
+  } catch (err) {
+    console.error('❌ Connection failed:', err);
+    throw err;
+  }
 }
+
 
 // Test route
 router.get('/', (req, res) => {

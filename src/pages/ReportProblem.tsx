@@ -56,7 +56,7 @@ const ReportProblem: React.FC = () => {
 
     try {
       const response = await fetch(
-        'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/report-problem',
+        'https://sg9w2ksj-5000.inc1.devtunnels.ms/api/report-problem',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

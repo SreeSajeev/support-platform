@@ -21,13 +21,13 @@ const config = {
 
 // --- Middleware ---
 app.use(cors({
-  origin: 'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev',
+    origin: 'https://sg9w2ksj-8080.inc1.devtunnels.ms',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
   credentials: true,
 }));
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-8080.app.github.dev");
+  res.setHeader("Access-Control-Allow-Origin", "https://sg9w2ksj-8080.inc1.devtunnels.ms");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   next();
@@ -59,7 +59,7 @@ const TicketDetailsRoutes = require('./routes/ticketdetails');
 const TicketResponseRoutes = require('./routes/response');
 const UserIDRoutes = require('./routes/userid');
 const PreviousTicketRoutes = require('./routes/previouslysubmittedtickets');
-const LoginRoutes = require('./routes/login');
+const loginRoutes = require('./routes/login');
 const SearchRoutes = require('./routes/search');
 
 
@@ -73,10 +73,9 @@ app.use('/api/it-performance', ITPerformanceRoutes);
 app.use('/api/ticket-details', TicketDetailsRoutes);
 app.use('/api/ticket-responses', TicketResponseRoutes);
 app.use('/api/userid', UserIDRoutes);
-app.use('/api/login', LoginRoutes);
-app.use('/api/search', SearchRoutes);
 app.use('/api/previously-submitted-tickets',  PreviousTicketRoutes);
-
+app.use('/api/login', loginRoutes); 
+app.use('/api/search', SearchRoutes);  
 // --- Root Route (For Quick Test) ---
 app.get('/', (req, res) => {
   res.send('🚀 Welcome to the Support Platform Backend API!');

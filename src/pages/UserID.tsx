@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { ArrowLeft, UserPlus, Upload } from 'lucide-react';
 import Header from '../components/Header';
@@ -16,8 +17,7 @@ const UserIdRequest: React.FC = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [activeField, setActiveField] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
-  
-  // Access Type checkboxes
+
   const [accessTypes, setAccessTypes] = useState({
     emailTeams: false,
     sapIdAuthorization: false,
@@ -29,8 +29,7 @@ const UserIdRequest: React.FC = () => {
     omniFlow: false,
     kmPortal: false
   });
-  
-  // Form fields
+
   const [OtherApplication, setOtherApplication] = useState('');
   const [Username, setUsername] = useState('');
   const [Employee_ID, setEmployeeNumber] = useState('');
@@ -49,15 +48,24 @@ const UserIdRequest: React.FC = () => {
     }));
   };
 
+  const handleFocus = (fieldName: string) => setActiveField(fieldName);
+  const handleBlur = () => setActiveField(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileName(e.target.files[0].name);
+      toast.info(`File "${e.target.files[0].name}" selected.`);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!Username || !Employee_ID || !Email) {
       toast.error('Please fill in the required fields: Username, Employee ID, and Email ID.');
       return;
     }
-    
-    // Check if at least one access type is selected
+
     const hasAccessType = Object.values(accessTypes).some(value => value) || OtherApplication;
     if (!hasAccessType) {
       toast.error('Please select at least one access type or specify other application.');
@@ -65,40 +73,27 @@ const UserIdRequest: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/userid', {
+      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/userid', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           accessTypes,
           OtherApplication,
           Username,
           Employee_ID,
           Designation,
-          Email, 
-          Department, 
-          Mobile, 
+          Email,
+          Department,
+          Mobile,
           Location,
           Reporting_to,
           authorizationDetails,
-        }),
+        })
       });
 
       if (response.ok) {
         toast.success('Your User ID request has been submitted successfully!');
-        // Reset form
-        setAccessTypes({
-          emailTeams: false,
-          sapIdAuthorization: false,
-          vpnId: false,
-          internetAccess: false,
-          stockitPortal: false,
-          powerBi: false,
-          omniDocs: false,
-          omniFlow: false,
-          kmPortal: false
-        });
+        setAccessTypes({ emailTeams: false, sapIdAuthorization: false, vpnId: false, internetAccess: false, stockitPortal: false, powerBi: false, omniDocs: false, omniFlow: false, kmPortal: false });
         setOtherApplication('');
         setUsername('');
         setEmployeeNumber('');
@@ -120,44 +115,75 @@ const UserIdRequest: React.FC = () => {
     }
   };
 
-  const handleFocus = (fieldName: string) => {
-    setActiveField(fieldName);
-  };
+  const handleDownloadPDF = async () => {
+    const hasAccessType = Object.values(accessTypes).some(value => value) || OtherApplication;
+    if (!hasAccessType) {
+      toast.error('Please select at least one access type or specify other application.');
+      return;
+    }
 
-  const handleBlur = () => {
-    setActiveField(null);
-  };
+    try {
+      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/userid/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accessTypes,
+          OtherApplication,
+          Username,
+          Employee_ID,
+          Designation,
+          Email,
+          Department,
+          Mobile,
+          Location,
+          Reporting_to,
+          authorizationDetails,
+        })
+      });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFileName(e.target.files[0].name);
-      toast.info(`File "${e.target.files[0].name}" selected.`);
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to generate PDF.');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `UserID_Request_${Employee_ID || 'form'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF downloaded!');
+    } catch (err) {
+      toast.error('Something went wrong while downloading PDF.');
+      console.error('❌ PDF download error:', err);
     }
   };
 
   return (
     <div className="lt-bg min-h-screen w-full flex flex-col items-center">
       <Header />
-      
       <div className="max-w-[1366px] w-full px-4 py-8">
         <div className="text-center mb-8">
           <h2 className="text-[30pt] font-light text-lt-darkBlue">User ID Creation & Authorization Request</h2>
         </div>
-        
         <div className="form-container w-full p-8 relative hover-card">
-           <motion.button
-                      onClick={() => navigate('/')}
-                      className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
-                      onMouseEnter={() => setIsHovering(true)}
-                      onMouseLeave={() => setIsHovering(false)}
-                      whileHover={{ x: -5 }}
-                      whileTap={{ scale: 0.97 }}
-                      variants={itemVariants}
-                    >
-                      <ArrowLeft className="w-6 h-6 mr-1" />
-                      <span className="text-sm font-medium">Back to Helpdesk</span>
-                    </motion.button>
-          
+          <motion.button
+            onClick={() => navigate('/index')}
+            className="back-button absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            whileHover={{ x: -5 }}
+            whileTap={{ scale: 0.97 }}
+            variants={itemVariants}
+          >
+            <ArrowLeft className="w-6 h-6 mr-1" />
+            <span className="text-sm font-medium">Back to Helpdesk</span>
+          </motion.button>
+
           <form onSubmit={handleSubmit} className="pt-12">
             {/* Access Types Section */}
             <div className="mb-8">
@@ -455,20 +481,17 @@ const UserIdRequest: React.FC = () => {
               </div>
             </div>
             
-            <motion.div 
-              className="flex justify-center mt-10"
-              variants={itemVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <button 
-                type="submit" 
-                className="lt-button-primary min-w-[180px] w-full max-w-xs flex items-center justify-center"
-              >
+            <motion.div className="flex justify-center mt-10" variants={itemVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <button type="submit" className="lt-button-primary min-w-[180px] w-full max-w-xs flex items-center justify-center">
                 <UserPlus className="w-5 h-5 mr-2" />
                 Submit User ID Request
+              </button>
+            </motion.div>
+
+            <motion.div className="flex justify-center mt-4" variants={itemVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <button type="button" onClick={handleDownloadPDF} className="lt-button-primary min-w-[180px] w-full max-w-xs flex items-center justify-center bg-green-600 hover:bg-green-700">
+                <Upload className="w-5 h-5 mr-2" />
+                Download as PDF
               </button>
             </motion.div>
           </form>

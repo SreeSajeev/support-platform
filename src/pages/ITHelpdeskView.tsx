@@ -65,7 +65,7 @@ const ITHelpdeskView: React.FC = () => {
       setError(null);
       try {
         const res = await fetch(
-          'https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/helpdesk-view/tickets'
+          'https://sg9w2ksj-5000.inc1.devtunnels.ms/api/helpdesk-view/tickets'
         );
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data = await res.json();

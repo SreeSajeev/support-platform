@@ -54,7 +54,7 @@ const Clarification: React.FC = () => {
   }
 
   try {
-    const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/clarification', {
+    const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/clarification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

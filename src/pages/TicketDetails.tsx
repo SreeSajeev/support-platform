@@ -324,7 +324,7 @@ const TicketDetails: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/ticket-details/', {
+      const res = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-details/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

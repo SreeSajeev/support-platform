@@ -13,6 +13,7 @@ const SearchIssue: React.FC = () => {
   const [problemDescription, setProblemDescription] = useState('');
   const [year, setYear] = useState('');
   const [psNumber, setPsNumber] = useState('');
+  const [results, setResults] = useState<any[]>([]);
 
   const [searchAreas, setSearchAreas] = useState({
     subject: true,
@@ -32,7 +33,7 @@ const SearchIssue: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://reimagined-space-eureka-q7qrj6xwwx6qcxpjr-5000.app.github.dev/api/search', {
+      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -46,8 +47,12 @@ const SearchIssue: React.FC = () => {
       });
 
       const result = await response.json();
-      console.log('Search results:', result);
-      toast.success('Search completed successfully!');
+      if (response.ok) {
+        setResults(result);
+        toast.success('Search completed successfully!');
+      } else {
+        toast.error(result.error || 'Search failed.');
+      }
     } catch (error) {
       console.error('Search failed:', error);
       toast.error('Search failed. Please try again.');
@@ -185,6 +190,21 @@ const SearchIssue: React.FC = () => {
               </button>
             </div>
           </form>
+
+          {results.length > 0 && (
+            <div className="mt-10 bg-white p-6 rounded shadow">
+              <h3 className="text-xl font-semibold text-lt-darkBlue mb-4">Search Results</h3>
+              <ul className="divide-y divide-gray-200">
+                {results.map((ticket, idx) => (
+                  <li key={idx} className="py-2">
+                    <p><strong>Issue:</strong> {ticket.Subject || 'N/A'}</p>
+                    <p><strong>Transaction:</strong> {ticket.Transaction || 'N/A'}</p>
+                    <p><strong>Date:</strong> {ticket.Date ? new Date(ticket.Date).toLocaleDateString() : 'N/A'}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
