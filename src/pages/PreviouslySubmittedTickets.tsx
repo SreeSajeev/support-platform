@@ -108,7 +108,7 @@ const containerVariants = {
      
         <div className="relative w-full h-full">
             <motion.button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/index')}
                 className="absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center z-50"
                 whileHover={{ x: -5 }}
                 whileTap={{ scale: 0.97 }}

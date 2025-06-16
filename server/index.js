@@ -59,6 +59,8 @@ const TicketDetailsRoutes = require('./routes/ticketdetails');
 const TicketResponseRoutes = require('./routes/response');
 const UserIDRoutes = require('./routes/userid');
 const PreviousTicketRoutes = require('./routes/previouslysubmittedtickets');
+const LoginRoutes = require('./routes/login');
+const SearchRoutes = require('./routes/search');
 
 
 app.use('/api/report-problem', reportProblemRoute);
@@ -71,6 +73,8 @@ app.use('/api/it-performance', ITPerformanceRoutes);
 app.use('/api/ticket-details', TicketDetailsRoutes);
 app.use('/api/ticket-responses', TicketResponseRoutes);
 app.use('/api/userid', UserIDRoutes);
+app.use('/api/login', LoginRoutes);
+app.use('/api/search', SearchRoutes);
 app.use('/api/previously-submitted-tickets',  PreviousTicketRoutes);
 
 // --- Root Route (For Quick Test) ---
