@@ -7,48 +7,51 @@ const path = require('path');
 
 const router = express.Router();
 
-// Azure SQL config
+// SQL Server config
 const config = {
-  user: 'adminuser',
-  password: 'BUR123ger@',
-  server: 'supportserver123.database.windows.net',
-  database: 'supportDB',
+  user: 'helpdesk_admin',
+  password: 'Helpdesk123!',
+  server: 'localhost',
+  port: 1433,
+  database: 'test',
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: false,
+    trustServerCertificate: true,
   },
 };
 
+// Database connection pooling
 let pool;
 async function getPool() {
-  if (pool) {
-    try {
-      await pool.request().query('SELECT 1');
-      return pool;
-    } catch (err) {
-      console.warn('⚠️ Reconnecting to SQL Server...');
-      await pool.close().catch(() => {});
-      pool = null;
-    }
-  }
-
+  if (pool) return pool;
   try {
     pool = await sql.connect(config);
-    console.log('✅ Connected to Azure SQL');
+    console.log('Connected to SQL (IT Helpdesk View)');
     return pool;
   } catch (err) {
-    console.error('❌ Connection failed:', err);
+    console.error('❌ Failed to connect to DB:', err);
     throw err;
   }
 }
 
+// File upload config
 const upload = multer({ dest: 'uploads/' });
 
+// Test route
 router.get('/', (req, res) => {
   res.send('User ID API running...');
 });
 
-// ============ ORIGINAL ROUTE ============
+// Ensure 'generated' folder exists
+function ensureGeneratedFolder() {
+  const generatedDir = path.join(__dirname, '../../generated');
+  if (!fs.existsSync(generatedDir)) {
+    fs.mkdirSync(generatedDir, { recursive: true });
+  }
+  return generatedDir;
+}
+
+// ============ ROUTE 1 ============
 // Save to DB + generate and return PDF
 router.post('/', upload.single('attachment'), async (req, res) => {
   try {
@@ -101,18 +104,21 @@ router.post('/', upload.single('attachment'), async (req, res) => {
       `);
 
     // Generate PDF
+    const generatedDir = ensureGeneratedFolder();
+    const pdfPath = path.join(generatedDir, `UserID_${Employee_ID}.pdf`);
     const doc = new PDFDocument();
-    const pdfPath = path.join(__dirname, `../../generated/UserID_${Employee_ID}.pdf`);
     const writeStream = fs.createWriteStream(pdfPath);
     doc.pipe(writeStream);
 
     doc.fontSize(20).text('User ID Request Form', { align: 'center' }).moveDown();
+
     const entries = {
       Username, Employee_ID, Designation, Email, Department, Mobile, Location,
       Reporting_to, Details, OtherApplication, AttachmentFileNames,
       Email_Teams, Internet_Access, OmniDocs, SAP_ID_Authorization, Stockit_Portal,
       OmniFlow, VPN_ID, Power_BI, KM_Portal
     };
+
     Object.entries(entries).forEach(([key, val]) => {
       doc.fontSize(12).text(`${key.replace(/_/g, ' ')}: ${val}`);
     });
@@ -124,7 +130,7 @@ router.post('/', upload.single('attachment'), async (req, res) => {
           console.error('Download error:', err);
           res.status(500).send('Failed to send PDF');
         }
-        fs.unlink(pdfPath, () => {}); // cleanup
+        fs.unlink(pdfPath, () => {}); // clean up
       });
     });
   } catch (err) {
@@ -133,7 +139,7 @@ router.post('/', upload.single('attachment'), async (req, res) => {
   }
 });
 
-// ============ NEW ROUTE ============
+// ============ ROUTE 2 ============
 // Generate and return PDF only (no DB insert)
 router.post('/pdf', async (req, res) => {
   try {
@@ -145,18 +151,21 @@ router.post('/pdf', async (req, res) => {
       VPN_ID, Power_BI, KM_Portal
     } = req.body;
 
+    const generatedDir = ensureGeneratedFolder();
+    const pdfPath = path.join(generatedDir, `UserID_${Employee_ID || 'form'}.pdf`);
     const doc = new PDFDocument();
-    const pdfPath = path.join(__dirname, `../../generated/UserID_${Employee_ID || 'form'}.pdf`);
     const writeStream = fs.createWriteStream(pdfPath);
     doc.pipe(writeStream);
 
     doc.fontSize(20).text('User ID Request Form (Preview)', { align: 'center' }).moveDown();
+
     const entries = {
       Username, Employee_ID, Designation, Email, Department, Mobile, Location,
       Reporting_to, Details, OtherApplication,
       Email_Teams, Internet_Access, OmniDocs, SAP_ID_Authorization, Stockit_Portal,
       OmniFlow, VPN_ID, Power_BI, KM_Portal
     };
+
     Object.entries(entries).forEach(([key, val]) => {
       doc.fontSize(12).text(`${key.replace(/_/g, ' ')}: ${val}`);
     });
@@ -168,7 +177,7 @@ router.post('/pdf', async (req, res) => {
           console.error('Download error:', err);
           res.status(500).send('Failed to send PDF');
         }
-        fs.unlink(pdfPath, () => {}); // cleanup
+        fs.unlink(pdfPath, () => {}); // clean up
       });
     });
   } catch (err) {

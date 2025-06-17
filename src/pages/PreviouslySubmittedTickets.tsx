@@ -9,7 +9,7 @@ interface Ticket {
   id: string;
   domain: string;
   Type: string;
-  psNumber: string;
+  email: string;
   currentStatus: string;
   createdAt: string;
   assignedTo: string;
@@ -28,13 +28,14 @@ const AssignedTickets: React.FC = () => {
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const psNumber = user.psNumber;
-  
+  const email = user.email;
+
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await fetch(`https://sg9w2ksj-5000.inc1.devtunnels.ms/previously-submitted-tickets?psNumber=${encodeURIComponent(psNumber)}`);
+        const res = await fetch(`http://localhost:5000/api/previously-submitted-tickets?email=${encodeURIComponent(email)}`);
+
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data: Ticket[] = await res.json();
         setTickets(data);
@@ -77,7 +78,7 @@ const AssignedTickets: React.FC = () => {
     .sort((a, b) => {
       if (sortBy === 'latest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      return a.psNumber.localeCompare(b.psNumber);
+      return a.email.localeCompare(b.email);
     });
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -162,7 +163,7 @@ const containerVariants = {
 
         {filteredAndSorted.length === 0 ? (
           <div className="bg-white p-6 rounded shadow text-center text-gray-500">
-            No tickets found for "{psNumber}".
+            No tickets found for "{email}".
           </div>
         ) : (
           <div className="space-y-4">
@@ -180,7 +181,8 @@ const containerVariants = {
                     <div className="text-sm text-gray-600 flex flex-wrap gap-3">
                       <span>{ticket.domain}</span>
                       <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {formatDate(ticket.createdAt)}</span>
-                      <span>PS: {ticket.psNumber}</span>
+                      <span>Email: {ticket.email}</span>
+
                     </div>
                   </div>
                   <div className="text-sm text-right text-gray-500">

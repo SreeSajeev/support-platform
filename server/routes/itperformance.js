@@ -2,32 +2,38 @@ const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
 
-// Azure SQL config
 const config = {
-  user: 'adminuser',
-  password: 'BUR123ger@',
-  server: 'supportserver123.database.windows.net',
-  database: 'supportDB',
+  user: 'helpdesk_admin', // or your SQL user
+  password: 'Helpdesk123!', // your password
+  server: 'localhost',       // no \SQLEXPRESS
+  port: 1433,
+  database: 'test',
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
-  },
+    encrypt: false,
+    trustServerCertificate: true,
+  }
 };
 
-// Reuse connection pool
+
+
 let pool;
+
 async function getPool() {
-  if (pool) return pool;
   try {
+    if (pool) {
+      // Check if connection is still active
+      await pool.request().query('SELECT 1');
+      return pool;
+    }
     pool = await sql.connect(config);
-    console.log('Connected to Azure SQL (IT Performance Dashboard)');
+    console.log('Connected to SQL');
     return pool;
   } catch (err) {
-    console.error('❌ Failed to connect to DB:', err);
+    console.error('❌ SQL connection failed:', err.message);
+    pool = null; // Reset if it's broken
     throw err;
   }
 }
-
 // Test route
 router.get('/', (req, res) => {
   res.send('📊 IT Performance Dashboard API is running!');
@@ -47,7 +53,7 @@ router.get('/metrics', async (req, res) => {
       AssignedTo,
       Status,
       CAST(Date AS VARCHAR) as Date
-    FROM alltickets_table
+    FROM AllTickets
     WHERE ResolutionTime IS NOT NULL
     ORDER BY Date DESC
 `;
@@ -75,7 +81,7 @@ router.get('/tickets', async (req, res) => {
         AssignedTo,
         Status,
         CAST(Date AS VARCHAR) as Date
-      FROM alltickets_table
+      FROM AllTickets
       WHERE ResolutionTime IS NOT NULL
       ORDER BY Date DESC
     `;
@@ -93,7 +99,7 @@ router.get('/metrics', async (req, res) => {
     const pool = await getPool();
     const query = `
       SELECT Priority, ResolutionTime, SLACompliance, AssignedTo
-      FROM alltickets_table
+      FROM AllTickets
       WHERE ResolutionTime IS NOT NULL
     `;
     const result = await pool.request().query(query);

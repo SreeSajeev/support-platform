@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { ArrowLeft, UserPlus, Upload } from 'lucide-react';
 import Header from '../components/Header';
@@ -73,7 +71,7 @@ const UserIdRequest: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/userid', {
+      const response = await fetch('http://localhost:5000/api/userid', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -123,7 +121,7 @@ const UserIdRequest: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/userid/pdf', {
+      const response = await fetch('http://localhost:5000/api/userid/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

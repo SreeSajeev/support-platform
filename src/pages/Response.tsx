@@ -196,9 +196,11 @@ const Response: React.FC = () => {
 };
 
 export default Response;
+
+
 */}
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Paperclip, X, Send } from 'lucide-react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
@@ -209,12 +211,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Response: React.FC = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const { uniqueID } = location.state || {};
 
-  const [issueNumber, setIssueNumber] = useState("ITSK-2023-001");
+  const [loading, setLoading] = useState(false);
+  const [ticket, setTicket] = useState<any>(null);
   const [status, setStatus] = useState("In Progress");
-  const [startDate, setStartDate] = useState("2023-09-15T10:00");
-  const [targetDate, setTargetDate] = useState("2023-09-18T18:00");
+  const [startDate, setStartDate] = useState("");
+  const [targetDate, setTargetDate] = useState("");
   const [owner, setOwner] = useState("Alice Johnson");
   const [ccAddress, setCcAddress] = useState("");
   const [message, setMessage] = useState("");
@@ -223,10 +227,11 @@ const Response: React.FC = () => {
 
   const fetchThread = async () => {
     try {
-      const res = await fetch(`https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-responses/${issueNumber}`);
+      const res = await fetch(`http://localhost:5000/api/ticket-responses/${uniqueID}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch thread");
-      const formatted = data.map((entry: any) =>
+      setTicket(data.ticket);
+      const formatted = data.thread.map((entry: any) =>
         `[${new Date(entry.CreatedAt).toLocaleString()}] ${entry.Owner}: ${entry.Message}`
       ).join("\n");
       setResponseThread(formatted);
@@ -236,8 +241,8 @@ const Response: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchThread();
-  }, [issueNumber]);
+    if (uniqueID) fetchThread();
+  }, [uniqueID]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -258,14 +263,14 @@ const Response: React.FC = () => {
     setLoading(true);
 
     const payload = {
-      IssueNumber: issueNumber,
+      UniqueID: uniqueID,
       Status: status,
       Owner: owner,
-      StartDateTime: new Date(startDate).toISOString(),
-      TargetDateTime: new Date(targetDate).toISOString(),
+      StartDateTime: new Date(startDate || new Date()).toISOString(),
+      TargetDateTime: new Date(targetDate || new Date()).toISOString(),
       CCAddress: ccAddress,
       Message: message,
-      AttachmentFileName: attachments.map(f => f.name).join(', '),
+      AttachmentFileNames: attachments.map(f => f.name).join(', '),
       CreatedAt: new Date().toISOString()
     };
 
@@ -307,12 +312,14 @@ const Response: React.FC = () => {
           <Card className="shadow-lg">
             <CardHeader><CardTitle className="text-lt-darkBlue">Ticket Information</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Input readOnly value={issueNumber} placeholder="Issue Number" />
-              <Input value={status} onChange={(e) => setStatus(e.target.value)} placeholder="Status" />
+              <Input value={ticket?.ReportedBy || ''} readOnly placeholder="Reported By" />
+              <Input value={ticket?.Domain || ''} readOnly placeholder="Domain" />
+              <Input value={ticket?.Type || ''} readOnly placeholder="Type" />
               <Input value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Owner" />
               <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <Input type="datetime-local" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
               <Input type="email" value={ccAddress} onChange={(e) => setCcAddress(e.target.value)} placeholder="CC Address" />
+              <Input value={status} onChange={(e) => setStatus(e.target.value)} placeholder="Status" />
             </CardContent>
           </Card>
 

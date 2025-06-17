@@ -1,4 +1,4 @@
-// routes/login.js
+{/*// routes/login.js
 const express = require('express');
 const sql = require('mssql');
 const router = express.Router();
@@ -73,5 +73,76 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+module.exports = router;
+*/}
+// --- login.js (Local Login Route using Users table) ---
+const express = require('express');
+const sql = require('mssql');
+const router = express.Router();
+
+const config = {
+  user: 'helpdesk_admin', // or your SQL user
+  password: 'Helpdesk123!', // your password
+  server: 'localhost',       // no \SQLEXPRESS
+  port: 1433,
+  database: 'test',
+  options: {
+    encrypt: false,
+    trustServerCertificate: true,
+  }
+};
+
+
+
+let pool;
+
+async function getPool() {
+  try {
+    if (pool) {
+      // Check if connection is still active
+      await pool.request().query('SELECT 1');
+      return pool;
+    }
+    pool = await sql.connect(config);
+    console.log('Connected to SQL');
+    return pool;
+  } catch (err) {
+    console.error('❌ SQL connection failed:', err.message);
+    pool = null; // Reset if it's broken
+    throw err;
+  }
+}
+
+
+// Route to test connection
+router.get('/', (req, res) => {
+  res.send('🔐 Login route is live');
+});
+
+// Route to authenticate user
+router.post('/', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+    const pool = await getPool();
+    const result = await pool.request()
+      .input('email', sql.NVarChar, email)
+      .query(`SELECT userid, name, email, ps_number FROM Users WHERE email = @email`);
+
+    if (result.recordset.length === 0) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    return res.status(200).json(result.recordset[0]);
+  } catch (err) {
+    console.error('Login DB Error:', err);
+    return res.status(500).json({ error: 'Database error during login' });
+  }
+});
 
 module.exports = router;

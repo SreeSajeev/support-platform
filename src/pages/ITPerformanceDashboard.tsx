@@ -467,7 +467,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const BASE_URL = 'https://sg9w2ksj-5000.inc1.devtunnels.ms';
+        const BASE_URL = 'http://localhost:5000';
         const res = await fetch(`${BASE_URL}/api/it-performance/tickets`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();

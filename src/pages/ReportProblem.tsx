@@ -55,22 +55,18 @@ const ReportProblem: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        'https://sg9w2ksj-5000.inc1.devtunnels.ms/api/report-problem',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            description,
-            domain,
-            inputDetails,
-            systemMessage,
-            reportedBy,
-            psNumber,
-            email,
-          }),
-        }
-      );
+      const response = await fetch('http://localhost:5000/api/report-problem', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    description,
+    domain,
+    inputDetails,
+    systemMessage,
+    email,        // coming from localStorage
+  }),
+});
+
 
       if (response.ok) {
         const data = await response.json();
@@ -133,15 +129,7 @@ const ReportProblem: React.FC = () => {
               />
             </div>
 
-            <div>
-              <label className="form-label block mb-1">PS Number</label>
-              <input
-                type="text"
-                className="form-input bg-gray-100 cursor-not-allowed"
-                value={psNumber}
-                readOnly
-              />
-            </div>
+      
 
             <div>
               <label className="form-label block mb-1">Email</label>

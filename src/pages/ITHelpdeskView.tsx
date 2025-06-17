@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, Search } from 'lucide-react';
@@ -15,11 +14,11 @@ import {
 import { motion } from 'framer-motion';
 
 interface Ticket {
-  UniqueID: number | string;  // depending on your DB type, could be string or number
-  domain: string;
+  UniqueID: number | string;
+  Domain: string;
   Type: string;
   RaisedBy: string;
-  status: string;
+  Status: string;
   Date: string;
   AssignedTo: string;
 }
@@ -54,7 +53,6 @@ const ITHelpdeskView: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [domainFilter, setDomainFilter] = useState('');
@@ -64,9 +62,7 @@ const ITHelpdeskView: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(
-          'https://sg9w2ksj-5000.inc1.devtunnels.ms/api/helpdesk-view/tickets'
-        );
+        const res = await fetch('http://localhost:5000/api/helpdesk-view/tickets');
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data = await res.json();
         setTickets(data);
@@ -84,17 +80,13 @@ const ITHelpdeskView: React.FC = () => {
     let filtered = tickets;
 
     if (typeFilter) {
-      filtered = filtered.filter(t =>
-        t.Type.toLowerCase() === typeFilter.toLowerCase()
-      );
+      filtered = filtered.filter(t => t.Type.toLowerCase() === typeFilter.toLowerCase());
     }
     if (statusFilter) {
-      filtered = filtered.filter(t => t.status === statusFilter);
+      filtered = filtered.filter(t => t.Status === statusFilter);
     }
     if (domainFilter) {
-      filtered = filtered.filter(t =>
-        t.domain.toLowerCase().includes(domainFilter.toLowerCase())
-      );
+      filtered = filtered.filter(t => t.Domain.toLowerCase().includes(domainFilter.toLowerCase()));
     }
 
     setFilteredTickets(filtered);
@@ -108,29 +100,22 @@ const ITHelpdeskView: React.FC = () => {
       year: 'numeric',
     });
   };
+
   const calculateAge = (dateStr: string) => {
     const createdDate = new Date(dateStr);
     const today = new Date();
     const diff = Math.floor((today.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
     return `${diff} days`;
   };
-  
+
   const handleExportCSV = () => {
-    const headers = [
-      'ID',
-      'Domain',
-      'Type',
-      'Raised By',
-      'Status',
-      'Date',
-      'Assigned To',
-    ];
+    const headers = ['ID', 'Domain', 'Type', 'Raised By', 'Status', 'Date', 'Assigned To'];
     const data = filteredTickets.map(t => [
       t.UniqueID,
-      t.domain,
+      t.Domain,
       t.Type,
       t.RaisedBy,
-      t.status,
+      t.Status,
       formatDate(t.Date),
       t.AssignedTo,
     ]);
@@ -151,9 +136,9 @@ const ITHelpdeskView: React.FC = () => {
         ticketId: ticket.UniqueID,
         requestedBy: ticket.RaisedBy,
         date: ticket.Date,
-        status: ticket.status,
+        status: ticket.Status,
         age: calculateAge(ticket.Date),
-        domain: ticket.domain,
+        domain: ticket.Domain,
         type: ticket.Type,
       },
     });
@@ -234,7 +219,7 @@ const ITHelpdeskView: React.FC = () => {
               <label className="form-label block mb-2">Filter by Domain</label>
               <select
                 className="form-input w-full"
-                value={domainFilter}            
+                value={domainFilter}
                 onChange={e => setDomainFilter(e.target.value)}
               >
                 <option value="">All Domains</option>
@@ -251,21 +236,19 @@ const ITHelpdeskView: React.FC = () => {
             </div>
           </motion.div>
 
-          <motion.div className="flex justify-end" variants={itemVariants}>
+          <motion.div className="flex justify-end gap-2" variants={itemVariants}>
             <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
               <Download className="w-4 h-4" />
               Export CSV
             </Button>
-             
             <Button
-      variant="secondary"  // Or "outline" or whatever your design system has
-      className="gap-2"
-      onClick={() => navigate('/it-performance-dashboard')}
-    >
-      IT Performance Dashboard
-    </Button>
+              variant="secondary"
+              className="gap-2"
+              onClick={() => navigate('/it-performance-dashboard')}
+            >
+              IT Performance Dashboard
+            </Button>
           </motion.div>
-          
         </motion.div>
 
         <motion.div
@@ -279,9 +262,7 @@ const ITHelpdeskView: React.FC = () => {
               🔄 Loading tickets...
             </p>
           ) : error ? (
-            <p className="p-6 text-center text-red-600 font-semibold">
-              ❌ {error}
-            </p>
+            <p className="p-6 text-center text-red-600 font-semibold">❌ {error}</p>
           ) : filteredTickets.length === 0 ? (
             <p className="p-6 text-center text-lt-grey">No tickets found.</p>
           ) : (
@@ -302,34 +283,29 @@ const ITHelpdeskView: React.FC = () => {
                 {filteredTickets.map(ticket => (
                   <TableRow key={ticket.UniqueID} className="hover:bg-lt-lightGrey">
                     <TableCell>{ticket.UniqueID}</TableCell>
-                    <TableCell>{ticket.domain}</TableCell>
+                    <TableCell>{ticket.Domain}</TableCell>
                     <TableCell>{ticket.Type}</TableCell>
                     <TableCell>{ticket.RaisedBy}</TableCell>
-                    <TableCell>{ticket.status}</TableCell>
+                    <TableCell>{ticket.Status}</TableCell>
                     <TableCell>{formatDate(ticket.Date)}</TableCell>
                     <TableCell className="flex gap-2">
-
-                      {(!ticket.AssignedTo || ticket.AssignedTo.trim() === "") ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleGoToTicket(ticket)}
-                      >
-                        Take Ticket
-                      </Button>
-                    ) : (
-                      <span>{ticket.AssignedTo}</span>
-                    )}
-
-                      
+                      {!ticket.AssignedTo || ticket.AssignedTo.trim() === '' ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleGoToTicket(ticket)}
+                        >
+                          Take Ticket
+                        </Button>
+                      ) : (
+                        <span>{ticket.AssignedTo}</span>
+                      )}
                     </TableCell>
-
                     <TableCell>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleGoToTicket(ticket)}
-
                       >
                         View
                       </Button>

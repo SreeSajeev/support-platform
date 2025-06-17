@@ -1,30 +1,42 @@
-
 const express = require('express');
 const sql = require('mssql');
 const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
+// SQL Server configuration
 const config = {
-  user: 'adminuser',
-  password: 'BUR123ger@',
-  server: 'supportserver123.database.windows.net',
-  database: 'supportDB',
+  user: 'helpdesk_admin',
+  password: 'Helpdesk123!',
+  server: 'localhost',
+  port: 1433,
+  database: 'test',
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: false,
+    trustServerCertificate: true,
   },
 };
 
 let pool;
+
+// Reuse or initialize SQL pool
 async function getPool() {
-  if (pool) return pool;
-  pool = await sql.connect(config);
-  console.log('✅ Connected to Azure SQL');
-  return pool;
+  try {
+    if (pool) {
+      await pool.request().query('SELECT 1'); // keep-alive check
+      return pool;
+    }
+    pool = await sql.connect(config);
+    console.log('✅ Connected to SQL (OldProblems)');
+    return pool;
+  } catch (err) {
+    console.error('❌ DB connection failed:', err.message);
+    pool = null;
+    throw err;
+  }
 }
 
-// 🔍 GET user info by email (used by frontend to prefill form)
+// 🔍 GET user info by email (for frontend prefill)
 router.get('/user-info', async (req, res) => {
   const { email } = req.query;
 
@@ -67,14 +79,12 @@ router.post('/', async (req, res) => {
     const pool = await getPool();
 
     const userResult = await pool.request()
-    .input('email', sql.NVarChar, email)
-    .query(`
-      SELECT name AS reportedBy, psNumber 
-      FROM Users 
-      WHERE email = @email
-    `);
-
-
+      .input('email', sql.NVarChar, email)
+      .query(`
+        SELECT name AS reportedBy, ps_number AS psNumber
+        FROM Users 
+        WHERE email = @email
+      `);
 
     if (userResult.recordset.length === 0) {
       return res.status(404).json({ error: 'User not found in Users table.' });
@@ -82,6 +92,7 @@ router.post('/', async (req, res) => {
 
     const { reportedBy, psNumber } = userResult.recordset[0];
 
+    // Insert into OldProblems (NO OUTPUT clause — trigger-safe)
     await pool.request()
       .input('problemID', sql.VarChar, problemID)
       .input('description', sql.NVarChar, description)
@@ -92,14 +103,18 @@ router.post('/', async (req, res) => {
       .input('psNumber', sql.NVarChar, psNumber)
       .input('email', sql.NVarChar, email)
       .query(`
+        SET NOCOUNT ON;
         INSERT INTO OldProblems (
-          problemID, description, domain, inputDetails, systemMessage, reportedBy, psNumber, email
+          problemID, description, domain, inputDetails, systemMessage,
+          reportedBy, psNumber, email
         )
         VALUES (
-          @problemID, @description, @domain, @inputDetails, @systemMessage, @reportedBy, @psNumber, @email
+          @problemID, @description, @domain, @inputDetails, @systemMessage,
+          @reportedBy, @psNumber, @email
         )
       `);
 
+    // Email confirmation
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -112,7 +127,21 @@ router.post('/', async (req, res) => {
       from: 'evakerenskyishere@gmail.com',
       to: email,
       subject: 'Problem Report Confirmation',
-      text: `Thank you for reporting a problem. Your Problem ID is ${problemID}. We will get back to you shortly with a resolution!`,
+      text: `
+Dear ${reportedBy},
+
+Thank you for reporting a problem through the IT Helpdesk Platform.
+
+ Problem ID: ${problemID}
+ Description: ${description}
+ Domain: ${domain}
+ Input Details: ${inputDetails || 'N/A'}
+ System Message: ${systemMessage || 'N/A'}
+
+We will get back to you shortly with a resolution.
+
+- IT Helpdesk Team
+`
     };
 
     await transporter.sendMail(mailOptions);

@@ -3,28 +3,36 @@ const sql = require('mssql');
 const router = express.Router();
 
 const config = {
-  user: 'adminuser',
-  password: 'BUR123ger@',
-  server: 'supportserver123.database.windows.net',
-  database: 'supportDB',
+  user: 'helpdesk_admin',
+  password: 'Helpdesk123!',
+  server: 'localhost',
+  port: 1433,
+  database: 'test', // or whatever you named it
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: false,
+    trustServerCertificate: true,
   },
 };
 
 let pool;
+
 async function getPool() {
-  if (pool) return pool;
   try {
+    if (pool) {
+      // Check if connection is still active
+      await pool.request().query('SELECT 1');
+      return pool;
+    }
     pool = await sql.connect(config);
-    console.log('Connected to Azure SQL');
+    console.log('Connected to SQL');
     return pool;
   } catch (err) {
-    console.error('DB Connection Error:', err);
+    console.error('❌ SQL connection failed:', err.message);
+    pool = null; // Reset if it's broken
     throw err;
   }
 }
+
 // Test route
 router.get('/', (req, res) => {
   res.send('📊 IT ticket details API is running!');

@@ -54,7 +54,7 @@ const Clarification: React.FC = () => {
   }
 
   try {
-    const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/clarification', {
+    const response = await fetch('http://localhost:5000/api/clarification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -182,16 +182,7 @@ const Clarification: React.FC = () => {
                 readOnly
               />
             </div>
-            <div>
-              <label className="form-label block mb-1">PS Number</label>
-              <input
-                type="text"
-                className="form-input bg-gray-100 cursor-not-allowed"
-                value={psNumber}
-                readOnly
-              />
-            </div>
-
+          
             <div>
               <label className="form-label block mb-1">Email</label>
               <input

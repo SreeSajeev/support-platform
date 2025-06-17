@@ -2,33 +2,43 @@ const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
 const nodemailer = require('nodemailer');
-// DB config
+
+// SQL Server config
 const config = {
-  user: 'adminuser',
-  password: 'BUR123ger@',
-  server: 'supportserver123.database.windows.net',
-  database: 'supportDB',
+  user: 'helpdesk_admin',
+  password: 'Helpdesk123!',
+  server: 'localhost',
+  port: 1433,
+  database: 'test',
   options: {
-    encrypt: true,
-    trustServerCertificate: false,
+    encrypt: false,
+    trustServerCertificate: true,
   },
 };
+
 let pool;
+
+// Get or reuse DB pool
 async function getPool() {
-  if (pool) return pool;
-  pool = await sql.connect(config);
-  console.log('✅ Connected to Azure SQL');
-  return pool;
+  try {
+    if (pool) {
+      await pool.request().query('SELECT 1');
+      return pool;
+    }
+    pool = await sql.connect(config);
+    console.log('✅ Connected to SQL (Clarification)');
+    return pool;
+  } catch (err) {
+    console.error('❌ Failed to connect to SQL:', err.message);
+    pool = null;
+    throw err;
+  }
 }
 
-
-// 🔍 GET user info by email (used by frontend to prefill form)
+// 🔍 GET user info (used to pre-fill form)
 router.get('/user-info', async (req, res) => {
   const { email } = req.query;
-
-  if (!email) {
-    return res.status(400).json({ error: 'Email query param is required' });
-  }
+  if (!email) return res.status(400).json({ error: 'Email is required' });
 
   try {
     const pool = await getPool();
@@ -47,82 +57,102 @@ router.get('/user-info', async (req, res) => {
     return res.status(200).json(result.recordset[0]);
   } catch (err) {
     console.error('❌ Error fetching user info:', err);
-    return res.status(500).json({ error: 'Server error fetching user info' });
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
-
-// POST /api/report-problem
+// 📝 POST clarification
 router.post('/', async (req, res) => {
-  console.log('📥 Clarification POST route called');
-  console.log('Request body:', req.body);
+  console.log('📥 Clarification POST hit:', req.body);
 
-  const { problemID,problemDescription, domain, problemStatement, attachmentPath,email } = req.body;
+  const {
+    problemID,
+    problemDescription,
+    domain,
+    problemStatement,
+    attachmentPath,
+    email
+  } = req.body;
 
   if (!problemDescription || !domain || !email) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  
+  const clarificationID = 'CL' + Date.now();
+
   try {
-    const pool = await sql.connect(config);
+    const pool = await getPool();
 
     const userResult = await pool.request()
-    .input('email', sql.NVarChar, email)
-    .query(`
-      SELECT name AS reportedBy, psNumber 
-      FROM Users 
-      WHERE email = @email
-    `);
-
-
+      .input('email', sql.NVarChar, email)
+      .query(`
+        SELECT name AS reportedBy, ps_number AS psNumber
+        FROM Users
+        WHERE email = @email
+      `);
 
     if (userResult.recordset.length === 0) {
-      return res.status(404).json({ error: 'User not found in Users table.' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    const { reportedBy,psNumber } = userResult.recordset[0];
-    const clarificationID = 'CL' + Date.now();
+    const { reportedBy, psNumber } = userResult.recordset[0];
 
     await pool.request()
       .input('clarificationID', sql.VarChar, clarificationID)
       .input('problemID', sql.VarChar, problemID)
       .input('problemDescription', sql.NVarChar, problemDescription)
       .input('domain', sql.NVarChar, domain)
-      .input('problemStatement', sql.NVarChar, problemStatement)
-      .input('attachmentPath', sql.NVarChar, attachmentPath)
+      .input('problemStatement', sql.NVarChar, problemStatement || '')
+      .input('attachmentPath', sql.NVarChar, attachmentPath || '')
       .input('reportedBy', sql.NVarChar, reportedBy)
       .input('psNumber', sql.NVarChar, psNumber)
       .input('email', sql.NVarChar, email)
       .query(`
-        INSERT INTO clarification (clarificationID,problemID,ProblemDescription, Domain, ProblemStatement, AttachmentPath,reportedBy, psNumber, email) 
-              VALUES (@clarificationID,@problemID,@problemDescription, @domain, @problemStatement, @attachmentPath,@reportedBy, @psNumber, @email)
-        `
-      );
+        SET NOCOUNT ON;
+        INSERT INTO clarification (
+          clarificationID, problemID, ProblemDescription, Domain,
+          ProblemStatement, AttachmentPath, reportedBy, psNumber, email
+        )
+        VALUES (
+          @clarificationID, @problemID, @problemDescription, @domain,
+          @problemStatement, @attachmentPath, @reportedBy, @psNumber, @email
+        )
+      `);
 
-
-    // Email acknowledgment
+    // Send acknowledgment email
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'evakerenskyishere@gmail.com',         // replace with your Gmail
-        pass: 'vaub huvm rggk scrt',      // use Gmail app password
+        user: 'evakerenskyishere@gmail.com',
+        pass: 'vaub huvm rggk scrt',
       },
     });
 
     const mailOptions = {
       from: 'evakerenskyishere@gmail.com',
       to: email,
-      subject: 'Clarification Confirmation',
-      text: `Thank you for reporting a clarification to your problem. We will get back to you shortly with a resolution!`,
+      subject: 'Clarification Submitted',
+      text: `
+Hi ${reportedBy},
+
+Your clarification has been submitted successfully.
+
+ Clarification ID: ${clarificationID}
+ Related Problem ID: ${problemID}
+ Description: ${problemDescription}
+ Domain: ${domain}
+
+Thank you,
+IT Helpdesk Team
+      `,
     };
 
     await transporter.sendMail(mailOptions);
 
-    return res.status(200).json({ message: ' Clarification reported successfully', problemID });
+    return res.status(200).json({ message: 'Clarification submitted successfully', clarificationID });
   } catch (err) {
-    console.error('❌ Error:', err);
-    return res.status(500).json({ error: 'Something went wrong while reporting the problem.' });
+    console.error('❌ Clarification submission failed:', err);
+    return res.status(500).json({ error: 'Failed to submit clarification' });
   }
 });
 

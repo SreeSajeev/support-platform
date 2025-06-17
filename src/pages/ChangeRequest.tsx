@@ -56,7 +56,7 @@ const ChangeRequest: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/change-requests', {
+      const response = await fetch('http://localhost:5000/api/change-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -79,7 +79,7 @@ const ChangeRequest: React.FC = () => {
         const data = await response.json();
         toast.success('Problem reported successfully!');
         alert(`Thank you for Submitting Change Request.`);
-
+        
 
         toast.success(' Change request submitted successfully!');
         // Reset form

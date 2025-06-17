@@ -264,6 +264,8 @@ import { Button } from '@/components/ui/button';
 const TicketDetails: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { uniqueID } = state || {};
 
   const {
     
@@ -324,7 +326,7 @@ const TicketDetails: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-details/', {
+      const res = await fetch('http://localhost:5000/api/ticket-details/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -343,7 +345,8 @@ const TicketDetails: React.FC = () => {
 
       if (!res.ok) throw new Error('Submission failed');
       toast.success('Submitted successfully');
-      navigate('/response');
+      navigate('/response', { state: { uniqueID } });
+
     } catch (err) {
       console.error(err);
       toast.error('Submission failed');

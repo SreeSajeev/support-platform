@@ -1029,6 +1029,8 @@ const TicketSummary: React.FC = () => {
   const [implementOAS, setImplementOAS] = React.useState(false);
   const [qualityTest, setQualityTest] = React.useState(false);
   const [implementPRD, setImplementPRD] = React.useState(false);
+  const { state } = useLocation();
+  const { uniqueID } = state || {};
 
 
   const handleSubmit = async () => {
@@ -1077,7 +1079,7 @@ const TicketSummary: React.FC = () => {
     };
   console.log("Payload being sent:", payload);
 
-  const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-summary/', {
+  const response = await fetch('http://localhost:5000/api/ticket-summary/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -1107,8 +1109,9 @@ const TicketSummary: React.FC = () => {
 
   toast.success("Ticket summary saved successfully!");
   
+
   navigate('/ticket-details', {
-  state: { ticketId, requestedBy, date, status, age, domain, type, searchTerm, transaction }
+  state: { uniqueID,ticketId, requestedBy, date, status, age, domain, type, searchTerm, transaction }
 });
 
 } catch (error: any) {

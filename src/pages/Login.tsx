@@ -7,40 +7,36 @@ const Login: React.FC = () => {
 
   // Form states
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic validation
-    if (!email || !password) {
-      setErrorMessage('Please fill in both email and password.');
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email.');
       return;
     }
 
     try {
-      const response = await fetch('https://sg9w2ksj-5000.inc1.devtunnels.ms/api/login/', {
+      const response = await fetch('http://localhost:5000/api/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
       });
 
+      const userData = await response.json();
+
       if (!response.ok) {
-        const errorText = await response.text();
-        setErrorMessage(errorText || 'Login failed. Check your credentials.');
+        setErrorMessage(userData.error || 'Login failed.');
         return;
       }
 
-      const userData = await response.json();
-      localStorage.setItem('user', JSON.stringify(userData)); // Persist user
-
-      // Redirect after login
+      localStorage.setItem('user', JSON.stringify(userData));
       navigate('/index');
     } catch (err) {
       console.error('Login error:', err);
-      setErrorMessage('Something went wrong. Please try again later.');
+      setErrorMessage('Server error. Please try again later.');
     }
   };
 
@@ -72,30 +68,6 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </div>
-
-            <div className="login-field">
-              <label className="form-label block mb-1">Password</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="Enter"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            <div className="flex justify-between items-center mb-4">
-              <label className="flex items-center text-sm text-lt-grey">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                  className="mr-2"
-                />
-                Remember me
-              </label>
-              <span className="text-sm text-lt-grey">Forgot Password?</span>
             </div>
 
             <div className="flex justify-center">
