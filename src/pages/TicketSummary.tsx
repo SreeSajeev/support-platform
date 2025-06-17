@@ -1013,7 +1013,7 @@ const TicketSummary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [reviewer, setReviewer] = useState("");
   const [trApplicability, setTrApplicability] = useState("Not Applicable");
-
+  const [priority, setPriority] = useState(""); 
   // Additional fields
   const [searchItem, setSearchItem] = useState("");
   const [transaction, setTransaction] = useState("");
@@ -1040,6 +1040,11 @@ const TicketSummary: React.FC = () => {
     toast.error("Please select Reviewer");
     return;
   }
+  if (!priority.trim()) {
+  toast.error("Please select Priority");
+  return;
+  } 
+
 
   setLoading(true);
 
@@ -1051,6 +1056,7 @@ const TicketSummary: React.FC = () => {
       searchTerm,
       requestedBy,
       reviewer,
+      priority,
       
       searchItem,
       transaction,
@@ -1174,6 +1180,20 @@ const TicketSummary: React.FC = () => {
                   {reviewersList.map((r) => (
                     <SelectItem key={r} value={r}>{r}</SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Priority */}
+            <div>
+              <label className="text-lt-darkBlue font-medium mb-1 block">Priority</label>
+              <Select value={priority} onValueChange={setPriority}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Low">Low</SelectItem>
+                  <SelectItem value="Medium">Medium</SelectItem>
+                  <SelectItem value="High">High</SelectItem>
                 </SelectContent>
               </Select>
             </div>
