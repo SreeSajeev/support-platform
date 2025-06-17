@@ -34,80 +34,81 @@ const EscalationMatrix: React.FC = () => {
   const escalationData = {
     coimbatorePlant: {
       hardware: {
-        level1: { name: "Alex Johnson", mobile: "xx", email: "alex.johnson@company.com" },
-        level2: { name: "Sarah Williams", mobile: "xx", email: "sarah.williams@company.com" },
-        level3: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
+        level1: { name: "Rajasekar R", mobile: "98429 11945", email: "MP.rajasekar@lntvalves.com" },
+        level2: { name: "Sachin PM", mobile: "72595 83461", email: "Ya.sachin@lntvalves.com" },
+        level3: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
         sla: { hardware: "Response – 2 Hrs*, Troubleshooting – 6 Hrs*, Replacement– 7 to 21 Days" }
       },
       remoteSupport: {
         level1: "Intercom: 5296 & 5284",
-        level2: { name: "David Miller", mobile: "xx", email: "david.miller@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        level2: { name: "Kesavan R", mobile: "81100 45803", email: "Kesavan.R@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: { remote: "Response – 2 Hrs*, Resolution – 4 Hrs*" }
       },
-      pm: { name: "Robert Wilson", mobile: "72595 83461", email: "robert.wilson@company.com" }
+      pm: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" }
     },
     kancheepuramPlant: {
       hardware: {
-        level1: { name: "Thomas Anderson", mobile: "xx", email: "thomas.anderson@company.com" },
-        level2: { name: "Sarah Williams", mobile: "xx", email: "sarah.williams@company.com" },
-        level3: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
+        level1: { name: "Chandramohan T", mobile: "99406 91916", email: "MP.CMohan@lntvalves.com" },
+        level2: { name: "Shivaganesh S", mobile: "88709 77736", email: "MP.Shiva@lntvalves.com" },
+        level3: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
         sla: { hardware: "Response – 2 Hrs*, Troubleshooting – 6 Hrs*, Replacement– 7 to 21 Days" }
       },
       remoteSupport: {
         level1: "Landline: 044 - 27285212",
-        level2: { name: "David Miller", mobile: "xx", email: "david.miller@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        level2: { name: "Kesavan R", mobile: "81100 45803", email: "Kesavan.R@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: { remote: "Response – 2 Hrs*, Resolution – 4 Hrs*" }
       },
-      pm: { name: "Kevin Smith", mobile: "88709 77736", email: "kevin.smith@company.com" }
+      pm: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" }
     },
     infrastructure: {
       network: {
-        fpr: { name: "Sarah Williams", mobile: "xx", email: "sarah.williams@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        fpr: { name: "Kesavan R", mobile: "81100 45803", email: "Kesavan.R@lntvalves.com" },
+        level2: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: "Response – 2 Hrs*, Resolution – 4 to 16 Hrs*"
       },
       domain: {
-        spr: { name: "David Miller", mobile: "xx", email: "david.miller@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" }
+        spr: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" },
+        level2: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" }
       },
       antivirus: {
-        fpr: { name: "Sarah Williams", mobile: "xx", email: "sarah.williams@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        fpr: { name: "Kesavan R", mobile: "81100 45803", email: "Kesavan.R@lntvalves.com" },
+        level2: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: "Response – 2 Hrs*, Resolution – 3 to 6 Hrs*"
       },
       vpn: {
-        spr: { name: "David Miller", mobile: "xx", email: "david.miller@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        spr: { name: "Elangovan M", mobile: "97915 01194", email: "Elangovan.M@lntvalves.com" },
+        level2: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: "Response – 2 Hrs*, Resolution – 3 to 6 Hrs*"
       }
     },
     applications: {
       omniDocs: {
-        level1: { name: "Sarah Williams", mobile: "xx", email: "sarah.williams@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        level1: { name: "Kesavan R", mobile: "81100 45803", email: "Kesavan.R@lntvalves.com" },
+        level2: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: "Response – 2 Hrs*, Resolution – 3 to 6 Hrs*"
       },
       sap: {
-        level1: { name: "Lisa Thompson", mobile: "xx", email: "lisa.thompson@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
-        sla: "Response – 2 Hrs*, Resolution – 3 to 6 Hrs*"
+        level1: { name: "Prasanthi S", mobile: "04226685264", email: "Prasanthi.S@lntvalves.com" },
+        level2: { name: "Palani Kumar KB", mobile: "98844 57769", email: "PalaniK.KB@lntvalves.com" },
+        level3: { name: "Natarajan K", mobile: "97903 31856", email: "Natarajan.K@lntvalves.com" },
+        sla: "Response – 2 Hrs*, Resolution – 4 to 16 Hrs*"
       },
       crm: {
-        level1: { name: "Emily Garcia", mobile: "xx", email: "emily.garcia@company.com" },
-        level2: { name: "Michael Brown", mobile: "xx", email: "michael.brown@company.com" },
-        level3: { name: "Jennifer Davis", mobile: "xx", email: "jennifer.davis@company.com" },
+        level1: { name: "Bharathi G", mobile: "97394 33347", email: "Bharathi.G@lntvalves.com" },
+        level2: { name: "Ramesh S (AGM-IT)", mobile: "98405 90170", email: "Ramesh.Seran@lntvalves.com" },
+        level3: { name: "Ramesh Srinivasan (Head-Comml & IT)", mobile: "90030 18964", email: "Ramesh.S@lntvalves.com" },
         sla: "Response – 2 Hrs*, Resolution – 3 to 6 Hrs*"
       }
     }
   };
+
 
   const renderContactCard = (person: any, level: string, description?: string) => (
     <div className="bg-gray-50 rounded-lg p-3">
