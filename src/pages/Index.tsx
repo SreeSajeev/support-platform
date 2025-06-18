@@ -31,6 +31,7 @@ const Index: React.FC = () => {
       status: "Open"
     }
   ];
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -296,24 +297,26 @@ const Index: React.FC = () => {
                   <p className="text-sm text-lt-grey mb-2 line-clamp-2">{ticket.title}</p>
                   <p className="text-xs text-lt-mutedGrey mb-3">Submitted: {ticket.date}</p>
                   <Button 
-                    onClick={() => navigate('/my-tickets')}
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full text-xs"
-                  >
-                    View Details
-                  </Button>
+                  onClick={() => navigate('/previously-submitted-tickets', { state: { email: user.email } })}
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs"
+                >
+                  View Details
+                </Button>
+
                 </div>
               ))}
             </div>
             <div className="mt-4 text-center">
               <Button 
-                onClick={() => navigate('/my-tickets')}
+                onClick={() => navigate('/previously-submitted-tickets', { state: { email: user.email } })}
                 variant="ghost" 
                 className="text-lt-brightBlue hover:text-lt-darkBlue"
               >
                 View All Tickets →
               </Button>
+
             </div>
           </div>
         </motion.div>

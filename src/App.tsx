@@ -46,6 +46,7 @@ const App = () => (
           <Route path="/it-escalation-matrix" element={<ITEscalationMatrix />} />
           <Route path="/my-tickets" element={<PreviouslySubmittedTickets />} />
           <Route path="/problems" element={<ProblemsPage />} />
+          <Route path="/previously-submitted-tickets" element={<PreviouslySubmittedTickets />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE  */}
           <Route path="*" element={<NotFound />} />
         </Routes>

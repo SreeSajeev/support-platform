@@ -6,17 +6,10 @@ import { ArrowLeft, Clock } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
 interface Ticket {
-  id: string;
-  domain: string;
+  UniqueID: string;
   Type: string;
-  email: string;
-  currentStatus: string;
-  createdAt: string;
-  assignedTo: string;
-  priority: string;
-  ResolutionDate: string;
-  ResolutionTime: number;
-  SLACompliance: string;
+  Status: string;
+  Date: string;
 }
 
 const AssignedTickets: React.FC = () => {
@@ -24,18 +17,15 @@ const AssignedTickets: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'psNumber'>('latest');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'open' | 'in-progress' | 'resolved' | 'closed'>('all');
 
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const email = user.email;
-
+  const email = user?.email;
 
   useEffect(() => {
     const fetchTickets = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/previously-submitted-tickets?email=${encodeURIComponent(email)}`);
-
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data: Ticket[] = await res.json();
         setTickets(data);
@@ -64,23 +54,13 @@ const AssignedTickets: React.FC = () => {
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, ease: "easeOut" }
-    }
-  };
+  const sortedTickets = [...tickets].sort((a, b) => {
+    if (sortBy === 'latest') return new Date(b.Date).getTime() - new Date(a.Date).getTime();
+    if (sortBy === 'oldest') return new Date(a.Date).getTime() - new Date(b.Date).getTime();
+    return a.UniqueID.localeCompare(b.UniqueID);
+  });
 
-  const filteredAndSorted = tickets
-    .filter(t => filterStatus === 'all' || t.currentStatus.toLowerCase().replace(' ', '-') === filterStatus)
-    .sort((a, b) => {
-      if (sortBy === 'latest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sortBy === 'oldest') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      return a.email.localeCompare(b.email);
-    });
-const containerVariants = {
+  const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -92,48 +72,48 @@ const containerVariants = {
       }
     }
   };
-     
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    }
+  };
 
   if (loading) return <div className="p-6 text-center text-gray-600">Loading tickets...</div>;
   if (error) return <div className="p-6 text-center text-red-500">Error: {error}</div>;
 
   return (
-    
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header title="IT HELPDESK" />
-      
+
       <motion.div 
         className="container mx-auto py-6 px-4 flex-grow max-w-6xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-     
         <div className="relative w-full h-full">
-            <motion.button
-                onClick={() => navigate('/index')}
-                className="absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center z-50"
-                whileHover={{ x: -5 }}
-                whileTap={{ scale: 0.97 }}
-                variants={itemVariants}
-            >
-                <ArrowLeft className="w-6 h-6 mr-1" />
-                <span className="text-sm font-medium">Back to Helpdesk</span>
-            </motion.button>
+          <motion.button
+            onClick={() => navigate('/index')}
+            className="absolute top-6 left-6 text-lt-darkBlue hover:text-lt-brightBlue transition-colors flex items-center z-50"
+            whileHover={{ x: -5 }}
+            whileTap={{ scale: 0.97 }}
+            variants={itemVariants}
+          >
+            <ArrowLeft className="w-6 h-6 mr-1" />
+            <span className="text-sm font-medium">Back to Helpdesk</span>
+          </motion.button>
         </div>
-        <motion.div 
-          className="text-center mb-8"
-          variants={itemVariants}
-        >
-          <h1 className="text-3xl md:text-4xl font-light text-blue-900 mb-2">My Previously Submitted Tickets</h1>
+
+        <motion.div className="text-center mb-8" variants={itemVariants}>
+          <h1 className="text-3xl md:text-4xl font-light text-blue-900 mb-2">My Previously Submitted Tickets </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Track all your reported issues and their history here
+            Track all the issues you've raised
           </p>
         </motion.div>
-
-    
-      <motion.div className="container mx-auto py-6 px-4 max-w-5xl">
-        
 
         <div className="flex flex-wrap gap-4 items-center justify-between mb-4">
           <div className="flex flex-wrap gap-4">
@@ -145,56 +125,38 @@ const containerVariants = {
                 <option value="psNumber">PS Number</option>
               </select>
             </label>
-
-            <label className="flex items-center gap-2 text-sm">
-              Filter:
-              <select className="border p-1 text-sm" value={filterStatus} onChange={e => setFilterStatus(e.target.value as any)}>
-                <option value="all">All</option>
-                <option value="open">Open</option>
-                <option value="in-progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-                <option value="closed">Closed</option>
-              </select>
-            </label>
           </div>
-
-          <span className="text-sm text-gray-600">{filteredAndSorted.length} ticket(s)</span>
+          <span className="text-sm text-gray-600">{sortedTickets.length} ticket(s)</span>
         </div>
 
-        {filteredAndSorted.length === 0 ? (
+        {sortedTickets.length === 0 ? (
           <div className="bg-white p-6 rounded shadow text-center text-gray-500">
             No tickets found for "{email}".
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredAndSorted.map(ticket => (
-              <div key={ticket.id} className="bg-white p-4 rounded shadow border border-gray-200 hover:shadow-md transition">
+            {sortedTickets.map(ticket => (
+              <div key={ticket.UniqueID} className="bg-white p-4 rounded shadow border border-gray-200 hover:shadow-md transition">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-xs text-blue-600">{ticket.id}</span>
-                      <Badge className={`text-xs ${getStatusColor(ticket.currentStatus)}`}>
-                        {ticket.currentStatus}
+                      <span className="font-mono text-xs text-blue-600">{ticket.UniqueID}</span>
+                      <Badge className={`text-xs ${getStatusColor(ticket.Status)}`}>
+                        {ticket.Status}
                       </Badge>
                     </div>
                     <div className="text-gray-800 font-semibold mb-1">{ticket.Type}</div>
                     <div className="text-sm text-gray-600 flex flex-wrap gap-3">
-                      <span>{ticket.domain}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {formatDate(ticket.createdAt)}</span>
-                      <span>Email: {ticket.email}</span>
-
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" /> {formatDate(ticket.Date)}
+                      </span>
                     </div>
-                  </div>
-                  <div className="text-sm text-right text-gray-500">
-                    <div>Priority: {ticket.priority}</div>
-                    <div>SLA: {ticket.SLACompliance}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </motion.div>
       </motion.div>
     </div>
   );

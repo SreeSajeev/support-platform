@@ -4,9 +4,9 @@ const sql = require('mssql');
 const router = express.Router();
 
 const config = {
-  user: 'helpdesk_admin', // or your SQL user
-  password: 'Helpdesk123!', // your password
-  server: 'localhost',       // no \SQLEXPRESS
+  user: 'helpdesk_admin',
+  password: 'Helpdesk123!',
+  server: 'localhost',
   port: 1433,
   database: 'test',
   options: {
@@ -15,13 +15,10 @@ const config = {
   }
 };
 
-
 let pool;
-
 async function getPool() {
   try {
     if (pool) {
-      // Check if connection is still active
       await pool.request().query('SELECT 1');
       return pool;
     }
@@ -30,10 +27,12 @@ async function getPool() {
     return pool;
   } catch (err) {
     console.error('❌ SQL connection failed:', err.message);
-    pool = null; // Reset if it's broken
+    pool = null;
     throw err;
   }
 }
+
+// ✅ Route using JOIN to match RaisedBy = name WHERE email matches
 router.get('/', async (req, res) => {
   const { email } = req.query;
 
@@ -43,24 +42,16 @@ router.get('/', async (req, res) => {
 
   try {
     const pool = await getPool();
-    const result = await pool.request()
+
+    const result = await pool
+      .request()
       .input('email', sql.NVarChar, email)
       .query(`
-        SELECT 
-          UniqueID AS id,
-          domain,
-          Type,
-          Email AS email,
-          status AS currentStatus,
-          Date AS createdAt,
-          AssignedTo AS assignedTo,
-          Priority AS priority,
-          ResolutionDate,
-          ResolutionTime,
-          SLACompliance
-        FROM AllTickets
-        WHERE Email = @email
-        ORDER BY Date DESC
+        SELECT t.UniqueID, t.Type, t.Status, t.Date, t.Domain, t.RaisedBy
+        FROM AllTickets t
+        JOIN users u ON t.RaisedBy = u.name
+        WHERE u.email = @email
+        ORDER BY t.Date DESC
       `);
 
     res.json(result.recordset);
@@ -69,7 +60,5 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Database query failed' });
   }
 });
-
-
 
 module.exports = router;

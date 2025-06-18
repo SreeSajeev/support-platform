@@ -4,7 +4,8 @@ import Logo from '../components/Logo';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
   // Form states
   const [email, setEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -33,7 +34,9 @@ const Login: React.FC = () => {
       }
 
       localStorage.setItem('user', JSON.stringify(userData));
-      navigate('/index');
+      
+      navigate('/index', { state: { email: user.email } });
+                      
     } catch (err) {
       console.error('Login error:', err);
       setErrorMessage('Server error. Please try again later.');
