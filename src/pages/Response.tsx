@@ -199,9 +199,11 @@ export default Response;
 
 
 */}
+
+// Imports remain unchanged
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Paperclip, X, Send } from 'lucide-react';
+import { ArrowLeft, Paperclip, X, Send, CheckCircle } from 'lucide-react';
 import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,16 +216,21 @@ const Response: React.FC = () => {
   const location = useLocation();
   const { uniqueID } = location.state || {};
 
-  const [loading, setLoading] = useState(false);
   const [ticket, setTicket] = useState<any>(null);
-  const [status, setStatus] = useState("In Progress");
+  const [loading, setLoading] = useState(false);
+  const [resolved, setResolved] = useState(false);
+  const [status, setStatus] = useState("");
   const [startDate, setStartDate] = useState("");
   const [targetDate, setTargetDate] = useState("");
-  const [owner, setOwner] = useState("Alice Johnson");
+  const [owner, setOwner] = useState("");
   const [ccAddress, setCcAddress] = useState("");
   const [message, setMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
   const [responseThread, setResponseThread] = useState("");
+
+  useEffect(() => {
+    if (uniqueID) fetchThread();
+  }, [uniqueID]);
 
   const fetchThread = async () => {
     try {
@@ -240,10 +247,6 @@ const Response: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (uniqueID) fetchThread();
-  }, [uniqueID]);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setAttachments([...attachments, ...Array.from(e.target.files)]);
@@ -255,38 +258,32 @@ const Response: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!message.trim()) {
-      toast.error("Please enter a message");
-      return;
-    }
-
+    if (!message.trim()) return toast.error("Please enter a message");
     setLoading(true);
 
     const payload = {
       UniqueID: uniqueID,
-      Status: status,
+      Status: resolved ? "Closed" : status,
       Owner: owner,
-      StartDateTime: new Date(startDate || new Date()).toISOString(),
-      TargetDateTime: new Date(targetDate || new Date()).toISOString(),
+      StartDateTime: new Date(startDate).toISOString(),
+      TargetDateTime: new Date(targetDate).toISOString(),
       CCAddress: ccAddress,
       Message: message,
       AttachmentFileNames: attachments.map(f => f.name).join(', '),
-      CreatedAt: new Date().toISOString()
+      CreatedAt: new Date().toISOString(),
+      CloseTicket: resolved
     };
 
     try {
-      const res = await fetch("https://sg9w2ksj-5000.inc1.devtunnels.ms/api/ticket-responses", {
+      const res = await fetch("http://localhost:5000/api/ticket-responses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Submission failed");
-      }
+      if (!res.ok) throw new Error((await res.json()).error || "Failed");
 
-      toast.success("Response sent successfully");
+      toast.success("Response sent");
       setMessage("");
       setAttachments([]);
       await fetchThread();
@@ -298,9 +295,9 @@ const Response: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-lt-offWhite">
+    <div className="min-h-screen bg-lt-offWhite">
       <Header title="RESPONSE" />
-      <div className="container mx-auto p-6 flex-grow">
+      <div className="container mx-auto p-6">
         <div className="flex items-center mb-6">
           <button onClick={() => navigate('/ticket-details')} className="text-lt-grey hover:text-lt-brightBlue flex items-center">
             <ArrowLeft className="w-5 h-5 mr-1" /> Back to Ticket Details
@@ -308,55 +305,52 @@ const Response: React.FC = () => {
         </div>
 
         <div className="grid gap-6">
-          {/* Ticket Info */}
-          <Card className="shadow-lg">
-            <CardHeader><CardTitle className="text-lt-darkBlue">Ticket Information</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Input value={ticket?.ReportedBy || ''} readOnly placeholder="Reported By" />
-              <Input value={ticket?.Domain || ''} readOnly placeholder="Domain" />
-              <Input value={ticket?.Type || ''} readOnly placeholder="Type" />
-              <Input value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="Owner" />
-              <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              <Input type="datetime-local" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
-              <Input type="email" value={ccAddress} onChange={(e) => setCcAddress(e.target.value)} placeholder="CC Address" />
-              <Input value={status} onChange={(e) => setStatus(e.target.value)} placeholder="Status" />
+          <Card>
+            <CardHeader><CardTitle>Ticket Information</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div><label>Reported By</label><Input value={ticket?.ReportedBy || ''} readOnly /></div>
+              <div><label>Domain</label><Input value={ticket?.Domain || ''} readOnly /></div>
+              <div><label>Type</label><Input value={ticket?.Type || ''} readOnly /></div>
+              <div><label>Owner</label><Input value={owner} onChange={e => setOwner(e.target.value)} /></div>
+              <div><label>Start Date</label><Input type="datetime-local" value={startDate} onChange={e => setStartDate(e.target.value)} /></div>
+              <div><label>Target Date</label><Input type="datetime-local" value={targetDate} onChange={e => setTargetDate(e.target.value)} /></div>
+              <div><label>CC Address</label><Input type="email" value={ccAddress} onChange={e => setCcAddress(e.target.value)} /></div>
+              <div><label>Status</label><Input value={status} onChange={e => setStatus(e.target.value)} /></div>
             </CardContent>
           </Card>
 
-          {/* Message Box */}
-          <Card className="shadow-lg">
-            <CardHeader><CardTitle className="text-lt-darkBlue">Your Message</CardTitle></CardHeader>
+          <Card>
+            <CardHeader><CardTitle>Your Message</CardTitle></CardHeader>
             <CardContent>
-              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className="w-full h-32" />
+              <Textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full h-32" />
               <label className="block mt-4 text-lt-brightBlue cursor-pointer">
                 <Paperclip className="inline w-4 h-4 mr-1" /> Upload Files
                 <input type="file" multiple onChange={handleFileChange} className="hidden" />
               </label>
               {attachments.map((file, i) => (
                 <div key={i} className="flex justify-between items-center bg-gray-100 p-2 mt-2 rounded">
-                  <span className="text-sm truncate">{file.name}</span>
-                  <Button variant="ghost" size="sm" onClick={() => removeAttachment(i)}>
-                    <X className="w-4 h-4" />
-                  </Button>
+                  <span>{file.name}</span>
+                  <Button variant="ghost" size="sm" onClick={() => removeAttachment(i)}><X /></Button>
                 </div>
               ))}
+              <div className="mt-4 flex items-center gap-3">
+                <input type="checkbox" id="resolved" checked={resolved} onChange={() => setResolved(!resolved)} />
+                <label htmlFor="resolved" className="text-sm">Mark as Resolved</label>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <Button onClick={handleSubmit} disabled={loading} className="lt-button-primary">
+                  <Send className="w-4 h-4 mr-1" /> {loading ? 'Sending...' : 'Submit Response'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Response Thread */}
-          <Card className="shadow-lg">
-            <CardHeader><CardTitle className="text-lt-darkBlue">Issue and Response Thread</CardTitle></CardHeader>
+          <Card>
+            <CardHeader><CardTitle>Response Thread</CardTitle></CardHeader>
             <CardContent>
               <Textarea readOnly value={responseThread} className="w-full h-64 bg-lt-offWhite/50" />
             </CardContent>
           </Card>
-
-          <div className="flex justify-end">
-            <Button className="lt-button-primary flex items-center gap-2" onClick={handleSubmit} disabled={loading}>
-              <Send className="h-4 w-4" />
-              {loading ? "Sending..." : "Reply to User"}
-            </Button>
-          </div>
         </div>
       </div>
     </div>

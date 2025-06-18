@@ -87,9 +87,8 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'Database insertion failed' });
   }
 });
-
 module.exports = router;
-*/}// ✅ FINAL response.js: Uses UniqueID, fetches ticket from AllTickets, and inserts into responseThread
+*/}// FINAL response.js: Uses UniqueID, fetches ticket from AllTickets, and inserts into responseThread
 const express = require('express');
 const sql = require('mssql');
 const nodemailer = require('nodemailer');
@@ -101,31 +100,16 @@ const config = {
   server: 'localhost',
   port: 1433,
   database: 'test',
-  options: {
-    encrypt: false,
-    trustServerCertificate: true,
-  },
+  options: { encrypt: false, trustServerCertificate: true },
 };
 
 let pool;
 async function getPool() {
   if (pool) return pool;
-  try {
-    pool = await sql.connect(config);
-    console.log('Connected to SQL (IT Helpdesk View)');
-    return pool;
-  } catch (err) {
-    console.error('❌ Failed to connect to DB:', err);
-    throw err;
-  }
+  pool = await sql.connect(config);
+  return pool;
 }
 
-// Test route
-router.get('/', (req, res) => {
-  res.send(' IT ticket responses API is running!');
-});
-
-// POST /api/ticket-responses
 router.post('/', async (req, res) => {
   const {
     UniqueID,
@@ -136,16 +120,18 @@ router.post('/', async (req, res) => {
     CCAddress,
     Message,
     AttachmentFileNames,
-    CreatedAt
+    CreatedAt,
+    CloseTicket
   } = req.body;
 
-  if (!Message || !Status || !Owner || !StartDateTime || !TargetDateTime) {
+  if (!Message) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
     const pool = await getPool();
     const request = pool.request()
+      .input('UniqueID', sql.UniqueIdentifier, UniqueID)
       .input('Status', sql.NVarChar, Status)
       .input('Owner', sql.NVarChar, Owner)
       .input('StartDateTime', sql.DateTime2, new Date(StartDateTime))
@@ -155,46 +141,56 @@ router.post('/', async (req, res) => {
       .input('AttachmentFileNames', sql.NVarChar(sql.MAX), AttachmentFileNames || '')
       .input('CreatedAt', sql.DateTime2, new Date(CreatedAt));
 
-    if (UniqueID) {
-      request.input('UniqueID', sql.UniqueIdentifier, UniqueID);
-    }
-
-    const query = `
+    await request.query(`
       INSERT INTO responseThread (
-        ${UniqueID ? 'UniqueID, ' : ''}Status, Owner, StartDateTime, TargetDateTime,
+        UniqueID, Status, Owner, StartDateTime, TargetDateTime,
         CCAddress, Message, AttachmentFileNames, CreatedAt
-      )
-      VALUES (
-        ${UniqueID ? '@UniqueID, ' : ''}@Status, @Owner, @StartDateTime, @TargetDateTime,
+      ) VALUES (
+        @UniqueID, @Status, @Owner, @StartDateTime, @TargetDateTime,
         @CCAddress, @Message, @AttachmentFileNames, @CreatedAt
       )
-    `;
+    `);
 
-    await request.query(query);
+    if (CloseTicket) {
+      const resolutionDate = new Date();
+      const slaQuery = await pool.request().query(`
+        SELECT DATEDIFF(DAY, Date, GETDATE()) AS ResolutionTime
+        FROM AllTickets
+        WHERE UniqueID = '${UniqueID}'
+      `);
+      const resolutionTime = slaQuery.recordset[0]?.ResolutionTime || 0;
+      const slaCompliant = resolutionTime <= 3;
+
+      await pool.request().query(`
+        UPDATE AllTickets
+        SET
+          Status = 'Closed',
+          ResolutionDate = GETDATE(),
+          ResolutionTime = ${resolutionTime},
+          SLACompliance = ${slaCompliant ? 1 : 0}
+        WHERE UniqueID = '${UniqueID}'
+      `);
+    }
 
     if (CCAddress) {
-      const transporter = nodemailer.createTransport({
+      await nodemailer.createTransport({
         service: 'gmail',
         auth: {
           user: 'evakerenskyishere@gmail.com',
           pass: 'vaub huvm rggk scrt'
         }
-      });
-
-      await transporter.sendMail({
+      }).sendMail({
         from: 'evakerenskyishere@gmail.com',
         to: CCAddress,
-        subject: `IT Support Ticket Response`,
-        text: `Message from IT:
-
-${Message}`
+        subject: 'IT Support Ticket Response',
+        text: `Message from IT:\n\n${Message}`
       });
     }
 
     res.json({ message: 'Response submitted successfully' });
   } catch (err) {
-    console.error('Insert Error:', err.message);
-    res.status(500).json({ error: 'Database insertion or email failed' });
+    console.error('Insert Error:', err);
+    res.status(500).json({ error: 'Database error or email failed' });
   }
 });
 
