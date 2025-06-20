@@ -265,18 +265,21 @@ const TicketDetails: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { uniqueID } = state || {};
+  
 
   const {
-    
-    date = '',
-    type= '',
-    domain='',
-    searchTerm = '',
-    transaction = '',
-    status = '',
-    age = '',
-  } = location.state || {};
+  uniqueID,
+  ticketId,        // ✅ grab ticketId (passed from TicketSummary)
+  requestedBy,
+  date,
+  type,
+  domain,
+  searchTerm,
+  transaction,
+  status,
+  age,
+} = state || {};
+
 
   const [problemStatement, setProblemStatement] = useState('');
   const [rootCause, setRootCause] = useState('');
@@ -330,7 +333,7 @@ const TicketDetails: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          
+          ticketId,
           ProblemStatement: problemStatement,
           RootCauseObjective: rootCause,
           ReviewRemarks: reviewRemarks,

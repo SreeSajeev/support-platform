@@ -1114,18 +1114,20 @@ const TicketSummary: React.FC = () => {
   
 
   navigate('/ticket-details', {
-      state: {
-        uniqueID,
-        ticketId,
-        requestedBy,
-        domain,
-        type,
-        status,
-        date,
-        startDate: new Date().toISOString(),
-        owner: reviewer,
-        reportedBy: requestedBy
-      }
+  state: {
+    uniqueID,
+    ticketId,
+    requestedBy,
+    domain,
+    type,
+    status,
+    date,
+    startDate: new Date().toISOString(),
+    owner: reviewer,
+    reportedBy: requestedBy
+  }
+
+
    
 });
 
