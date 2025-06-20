@@ -131,18 +131,22 @@ const ITHelpdeskView: React.FC = () => {
   };
 
   const handleGoToTicket = (ticket: Ticket) => {
-    navigate('/ticket-summary', {
-      state: {
-        ticketId: ticket.UniqueID,
-        requestedBy: ticket.RaisedBy,
-        date: ticket.Date,
-        status: ticket.Status,
-        age: calculateAge(ticket.Date),
-        domain: ticket.Domain,
-        type: ticket.Type,
-      },
-    });
-  };
+  const assignedBy = localStorage.getItem('userName') || 'Unknown';  // 👈 Add this
+
+  navigate('/ticket-summary', {
+    state: {
+      ticketId: ticket.UniqueID,
+      requestedBy: ticket.RaisedBy,
+      date: ticket.Date,
+      status: ticket.Status,
+      age: calculateAge(ticket.Date),
+      domain: ticket.Domain,
+      type: ticket.Type,
+      assignedBy  // 👈 Add this to pass to next screen
+    },
+  });
+};
+
 
   return (
     <div className="lt-bg min-h-screen w-full flex flex-col items-center bg-lt-offWhite">

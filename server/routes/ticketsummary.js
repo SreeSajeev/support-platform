@@ -22,7 +22,7 @@ async function getPool() {
       return pool;
     }
     pool = await sql.connect(config);
-    console.log('Connected to SQL');
+    console.log('✅ Connected to SQL');
     return pool;
   } catch (err) {
     console.error('❌ SQL connection failed:', err.message);
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
     implementOAS,
     qualityTest,
     implementPRD,
-    age
+    assignedBy
   } = req.body;
 
   if (!ticketId || !type || !domain || !searchTerm || !requestedBy || !reviewer) {
@@ -91,33 +91,31 @@ router.post('/', async (req, res) => {
       .input('qualityTest', sql.Bit, qualityTest)
       .input('implementPRD', sql.Bit, implementPRD)
       .input('uniqueID', sql.NVarChar, ticketId)
-
       .query(`
         INSERT INTO ticketSummary (
-  Type, Domain, SearchTerm, RequestedBy, Reviewer,
-  TRApplicability, TRDetails, TRReason,
-  Status, Date, 
-  TransactionName, Product, FunctionName,
-  Plant, MobileNumber, ExternalNumber,
-  DevelopConfigure, UnitTest, ImplementInOAS,
-  QualityTest, ImplementInPRD, CreatedAt, UniqueID
-)
-VALUES (
-  @type, @domain, @searchTerm, @requestedBy, @reviewer,
-  @trApplicable, @trDetails, @trReason,
-  @status, @date, 
-  @transactionName, @product, @functionName,
-  @plant, @mobileNumber, @externalNumber,
-  @developConfigure, @unitTest, @implementOAS,
-  @qualityTest, @implementPRD, GETDATE(), @uniqueID
-)
-
+          Type, Domain, SearchTerm, RequestedBy, Reviewer,
+          TRApplicability, TRDetails, TRReason,
+          Status, Date, 
+          TransactionName, Product, FunctionName,
+          Plant, MobileNumber, ExternalNumber,
+          DevelopConfigure, UnitTest, ImplementInOAS,
+          QualityTest, ImplementInPRD, CreatedAt, UniqueID
+        )
+        VALUES (
+          @type, @domain, @searchTerm, @requestedBy, @reviewer,
+          @trApplicable, @trDetails, @trReason,
+          @status, @date, 
+          @transactionName, @product, @functionName,
+          @plant, @mobileNumber, @externalNumber,
+          @developConfigure, @unitTest, @implementOAS,
+          @qualityTest, @implementPRD, GETDATE(), @uniqueID
+        )
       `);
 
-    // Update AllTickets with summary fields
+    // Update AllTickets
     await pool.request()
-      .input('uniqueID', sql.UniqueIdentifier, ticketId)
-      .input('reviewer', sql.NVarChar, reviewer)
+      .input('uniqueID', sql.NVarChar, ticketId)
+      .input('assignedTo', sql.NVarChar, assignedBy)
       .input('priority', sql.NVarChar, priority)
       .input('status', sql.NVarChar, status)
       .input('date', sql.NVarChar, date)
@@ -133,7 +131,7 @@ VALUES (
       .query(`
         UPDATE AllTickets
         SET
-          AssignedTo = @reviewer,
+          AssignedTo = @assignedTo,
           Priority = @priority,
           Status = @status,
           Date = @date,
@@ -149,15 +147,15 @@ VALUES (
         WHERE UniqueID = @uniqueID
       `);
 
-    res.json({ message: 'Ticket Summary saved and AllTickets updated successfully' });
+    res.json({ message: '✅ Ticket Summary saved and AllTickets updated successfully.' });
   } catch (err) {
-    console.error('DB insert error:', err);
+    console.error('❌ DB insert error:', err);
     res.status(500).json({ error: 'Failed to save ticket summary' });
   }
 });
 
 router.get('/', (req, res) => {
-  res.send('Ticket Summary endpoint is live.');
+  res.send('📡 Ticket Summary endpoint is live.');
 });
 
 module.exports = router;

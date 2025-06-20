@@ -998,15 +998,17 @@ const TicketSummary: React.FC = () => {
   const location = useLocation();
 
   // Destructure from location.state
-  const {
-    ticketId,
-    requestedBy = "",
-    date = "",
-    status = "",
-    age = "",
-    domain = "",
-    type = "",
-  } = location.state || {};
+ const {
+  ticketId,
+  requestedBy = "",
+  date = "",
+  status = "",
+  age = "",
+  domain = "",
+  type = "",
+  assignedBy = "", // 👈 Add this
+} = location.state || {};
+
 
   const [loading, setLoading] = useState(false);
 
@@ -1060,7 +1062,7 @@ const TicketSummary: React.FC = () => {
       requestedBy,
       reviewer,
       priority,
-      
+      assignedBy, // Include assignedBy in the payload
       searchItem,
       transaction,
       product,

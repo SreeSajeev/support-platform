@@ -30,9 +30,10 @@ const LoginPage: React.FC = () => {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        toast.success('Login successful!');
-        navigate('/it-helpdesk-view');
+      localStorage.setItem('userName', data.name);
+      localStorage.setItem('userEmail', data.email);
+      toast.success('Login successful!');
+      navigate('/it-helpdesk-view');
       } else {
         toast.error(data.message || 'Login failed');
       }

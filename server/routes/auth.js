@@ -52,6 +52,8 @@ router.post('/login', async (req, res) => {
 
     // Return user info directly (not secure, for internal use only)
     return res.json({
+      
+      token: user.name, // Just for now
       psNumber: user.psNumber,
       name: user.name,
       email: user.email,
